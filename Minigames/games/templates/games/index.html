@@ -1,0 +1,31 @@
+{% extends "games/layout.html" %}
+{% load static %}
+{% load mytags %}
+
+{% block body %}
+    <div class="container">
+        {% for amount in length %}
+            <div class="row">
+                <div class="col-lg-4 col-md-6 d-flex align-items-stretch">
+                    
+                    
+                    <a href="{% url 'game' games|index:amount games_id games_string %}"><img src="{{images|index:amount}}" alt="img" style="width: 100%"></a>
+                    
+                </div>
+                <div class="col-lg-8 col-md-6 ">
+                    <h1>{{games|index:amount}}</h1>
+                    <p>Description</p>
+                </div>
+            </div>
+        {% endfor %}
+
+    </div>
+    
+    
+    
+
+{% endblock %}
+
+{% block script %}
+    
+{% endblock %}
