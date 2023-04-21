@@ -70,7 +70,7 @@
 
 [id^="yeahboi"]{
     position: relative;
-    background-image: url("paper.gif");
+    
     background-color: rgb(0, 255, 149);
 }
 /* if we want to animate the we need to do something like this to a divison with an id:

@@ -33,7 +33,7 @@ class MyConsumer(WebsocketConsumer):
 
     def receive(self, text_data):
         text_data_json = json.loads(text_data)
-        # if command is "claim", message is team roster number. If its "draft", message is name of player drafted.
+       
         name = text_data_json['name']
         roomid = text_data_json['roomid']
         room = Room.objects.get(pk=roomid)
@@ -93,29 +93,55 @@ class MyConsumer(WebsocketConsumer):
             self.room_group_name,
             {
                 'type':'game_message',
-                'team_owners': "nothing at this point",
+                'team_owners': moved,
                 'roomid': roomid
                 
             }))
         except:
             pass
-
-        # I am thinking we can let this be the final function
-        if roomid:
-            team_owners = library[room.gamename].team_owner
-            if not name in team_owners:
-                team_owners += " %s" %(name)
-                library[room.gamename].team_owner= team_owners
-                library[room.gamename].save()
+        try:
+            # once we implement turns, we are going to have to specify here who made what move. I think we can just ask the instance's database for the turn. such as Checkers.objects.get(roomid=roomid).turn
+            # While this current solution works, I am thinking that we redo this so that gameplay.py handles this. I think that makes this more readable, but could also simplify things.
+            # I think we should use games_start to do it.
             
+            games_start = {
+                "Checkers": checkers_game,
+                #"Dice":dice
+            }
+            AIturn = text_data_json['AIturn']
+            
+            print("Its AI time", AIturn)
+
+            games_start[room.gamename](library[room.gamename])
+
             return(async_to_sync(self.channel_layer.group_send)(
             self.room_group_name,
             {
                 'type':'game_message',
-                'team_owners': team_owners.split(),
+                'team_owners': moved,
                 'roomid': roomid
                 
-            }
+            }))
+        except:
+            pass
+        print("this could be a problem if this is triggering every time")
+        # I am thinking we can let this be the final function
+        if library[room.gamename].started == False:
+            if roomid and len(text_data_json) <=2:
+                team_owners = library[room.gamename].team_owner
+                if not name in team_owners:
+                    team_owners += " %s" %(name)
+                    library[room.gamename].team_owner= team_owners
+                    library[room.gamename].save()
+                
+                return(async_to_sync(self.channel_layer.group_send)(
+                self.room_group_name,
+                {
+                    'type':'game_message',
+                    'team_owners': team_owners.split(),
+                    'roomid': roomid
+                    
+                }
         ))
         # we can pass a list by doing team_owners.split()
 

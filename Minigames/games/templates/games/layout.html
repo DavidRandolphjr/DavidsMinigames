@@ -26,7 +26,7 @@
                 {% if user.is_authenticated %}  
                   <li class="nav-item">
                     <a class="nav-link active" aria-current="page" href="{% url 'index' %}">My Drafts</a>
-                    <input  id="user-name" name="variable" value="{{ user.username }}">
+                    <input type="hidden" id="user-name" name="variable" value="{{ user.username }}">
                   </li>
                 {% endif %}  
                   <li class="nav-item">

@@ -46,15 +46,38 @@ function load_homepage(){
                     fetch('/board/' + document.getElementById("room").innerHTML)
                     .then(response => response.json())
                     .then(placement =>{
+                        
+                        
                         placement.forEach(place=>{
+                            const checker_spot = []
                             console.log("ace is the place", place)
+                            
+                            if(place["available_space"].length ==0){
+                                alert(place["player_turn"] + " loses")
+                            }
+                            if (place["player_turn"] == "AI" && place["available_space"].length >0){
+                                setTimeout(function(){
+                                    gameSocket.send(JSON.stringify({
+                                        "name": document.getElementById("name").innerHTML,
+                                        "roomid": document.getElementById("room").innerHTML,
+                                        "AIturn": "Make AI Move"
+                                    }))
+                                }, 2000);
+                            }
                             for(let count=0; count < place['open_spaces'].length; count++){
+                                if(document.getElementById(place['open_spaces'][count]).innerHTML != ''){
+                                    checker_spot.push(place['open_spaces'][count])
+                                    console.log("new checker spot",checker_spot, checker_spot.length)
+                                }
                                 document.getElementById(place['open_spaces'][count]).innerHTML = ''
                                 
                                 
                             }
                                 
                             for(let checker=0; checker < place["player_one"].length; checker++){
+                                if(document.getElementById(place["player_one"][checker]).innerHTML == '' && checker_spot.length >0){
+                                    
+                                }
                                 
                                 document.getElementById(place["player_one"][checker]).innerHTML = `
                                 <img src="/games/files/userimages/games_boardgames_artboard_15-512.png" style="width: 100%"/>
@@ -76,6 +99,9 @@ function load_homepage(){
                             
 
                             for(let checker=0; checker < place["player_two"].length; checker++){
+                                if(document.getElementById(place["player_two"][checker]).innerHTML == '' && checker_spot.length >0){
+                                    
+                                }
                                 document.getElementById(place["player_two"][checker]).innerHTML = `
                                 <img src="/games/files/userimages/red checker.png" style="width: 100%"/>
                                 `
@@ -94,6 +120,7 @@ function load_homepage(){
                             }
 
                         })
+                        
                     })
                     
                     for(let i =0; i < 8; i++){
@@ -137,28 +164,13 @@ function load_homepage(){
                                                         document.getElementById(place["available_space"][checker][1]).style.backgroundColor = "blue"
                                                         document.getElementById(place["available_space"][checker][1]).addEventListener('click', moving)
                                                         function moving(){
-                                                            let id = null;
-                                                            document.getElementById("0,0").innerHTML =`
-                                                            <div id ="yeahboi"><img src="/games/files/userimages/games_boardgames_artboard_15-512.png" style="width: 100%"/></div
-                                                            `
-                                                            document.getElementById("yeahboi").style.backgroundColor = "transparent";
-                                                            document.getElementById("yeahboi").style.border = 'none';
-                                                            const elem = document.getElementById("yeahboi");
-                                                            elem.style.position="relative"    
-                                                            let pos = 0;
-                                                            clearInterval(id);
-                                                            id = setInterval(frame, 10);
-                                                            function frame() {
-                                                                if (pos == -100) {
-                                                                
-                                                                clearInterval(id);
-                                                                } else {
-                                                                pos--; 
-                                                                elem.style.top = pos + "px"; 
-                                                                elem.style.left = pos + "px"; 
-                                                                }
-                                                            }
-                                                        
+                                                            
+                                                            gameSocket.send(JSON.stringify({
+                                                                "name": document.getElementById("name").innerHTML,
+                                                                "roomid": document.getElementById("room").innerHTML,
+                                                                "moved": [place["available_space"][checker][0], [place["available_space"][checker][1]]]
+                                                            }))
+                                                            loads +=1
                                                             document.getElementById(place["available_space"][checker][1]).removeEventListener('click', moving)
                                                         }
                                                         
@@ -168,34 +180,22 @@ function load_homepage(){
                                                         document.getElementById(place["available_space"][checker][1]).style.backgroundColor = "blue"
                                                         document.getElementById(place["available_space"][checker][1]).addEventListener('click', moving)
                                                         function moving(){
-                                                            let id = null;
-                                                            document.getElementById("0,0").innerHTML =`
-                                                            <div id ="yeahboi"><img src="/games/files/userimages/games_boardgames_artboard_15-512.png" style="width: 100%"></div
-                                                            `
-                                                            const elem = document.getElementById("yeahboi");    
-                                                            elem.style.position="relative" 
-                                                            let pos = 0;
-                                                            clearInterval(id);
-                                                            id = setInterval(frame, 10);
-                                                            function frame() {
-                                                                if (pos == -100) {
-                                                                
-                                                                clearInterval(id);
-                                                                } else {
-                                                                pos--; 
-                                                                elem.style.top = pos + "px"; 
-                                                                elem.style.left = pos + "px"; 
-                                                                }
-                                                            }
                                                             
+                                                            
+                                                            gameSocket.send(JSON.stringify({
+                                                                "name": document.getElementById("name").innerHTML,
+                                                                "roomid": document.getElementById("room").innerHTML,
+                                                                "moved": [place["available_space"][checker][0], [place["available_space"][checker][1]]]
+                                                            }))
                                                             document.getElementById(place["available_space"][checker][1]).removeEventListener('click', moving)
-                                                            
+                                                            loads +=1
                                                         }
                                                         
 
                                                     }
                                                 }
                                             }
+                                            
                                         })
 
                                     })
@@ -205,46 +205,50 @@ function load_homepage(){
                                     .then(response => response.json())
                                     .then(placement =>{
                                         placement.forEach(place=>{
-
-                                            for(let checker=0; checker < place["jumps"].length; checker++){
-                                                console.log("checking stuff", place['jumps'][checker][0] , [i,k])
-                                                if( place['jumps'][checker][0] == String([i,k])){
+                                            if (place["player_turn"] == document.getElementById("name").innerHTML){
+                                                for(let checker=0; checker < place["jumps"].length; checker++){
                                                     console.log("checking stuff", place['jumps'][checker][0] , [i,k])
-                                                    for(let jump_checker=0; jump_checker < place["jumps"][checker][1].length; jump_checker++){
-                                                        document.getElementById(place["jumps"][checker][1][jump_checker]).style.backgroundColor = "blue"
-                                                        document.getElementById(place["jumps"][checker][1][jump_checker]).addEventListener('click', jumping)
-                                                        function jumping(){
-                                                            
-                                                            gameSocket.send(JSON.stringify({
-                                                                "name": document.getElementById("name").innerHTML,
-                                                                "roomid": document.getElementById("room").innerHTML,
-                                                                "moved": [place["jumps"][checker][0], place["jumps"][checker][1]]
-                                                            }))
-                                                            
-                                                            document.getElementById(place["jumps"][checker][1][jump_checker]).removeEventListener('click', jumping)
+                                                    if( place['jumps'][checker][0] == String([i,k])){
+                                                        console.log("checking stuff", place['jumps'][checker][0] , [i,k])
+                                                        for(let jump_checker=0; jump_checker < place["jumps"][checker][1].length; jump_checker++){
+                                                            document.getElementById(place["jumps"][checker][1][jump_checker]).style.backgroundColor = "blue"
+                                                            document.getElementById(place["jumps"][checker][1][jump_checker]).addEventListener('click', jumping)
+                                                            function jumping(){
+                                                                // we have do delete the last value of place["jumps"][checker][1] and replace it with place["jumps"][checker][1][jump_checker]
+                                                                // to do this i am thinking of creating a const variable 
+                                                                const checkers_jumped = place["jumps"][checker][1]
+                                                                checkers_jumped.push(place["jumps"][checker][1][jump_checker])
+                                                                gameSocket.send(JSON.stringify({
+                                                                    "name": document.getElementById("name").innerHTML,
+                                                                    "roomid": document.getElementById("room").innerHTML,
+                                                                    "moved": [place["jumps"][checker][0], place["jumps"][checker][1]]
+                                                                }))
+                                                                loads+=1
+                                                                document.getElementById(place["jumps"][checker][1][jump_checker]).removeEventListener('click', jumping)
+                                                            }
                                                         }
+                                                        
                                                     }
-                                                    
-                                                }
-                                                if( place['jumps'][checker][0] == String([i,l])){
-                                                    console.log("this is jumps available",place['jumps'][checker])
-                                                    for(let jump_checker=0; jump_checker < place["jumps"][checker][1].length; jump_checker++){
-                                                        document.getElementById(place["jumps"][checker][1][jump_checker]).style.backgroundColor = "blue"
-                                                        document.getElementById(place["jumps"][checker][1][jump_checker]).addEventListener('click', jumping)
-                                                        function jumping(){
-                                                            
-                                                            gameSocket.send(JSON.stringify({
-                                                                "name": document.getElementById("name").innerHTML,
-                                                                "roomid": document.getElementById("room").innerHTML,
-                                                                "moved": [place["jumps"][checker][0], place["jumps"][checker][1]]
-                                                            }))
-                                                            
-                                                            document.getElementById(place["jumps"][checker][1][jump_checker]).removeEventListener('click', jumping)
-                                                            
+                                                    if( place['jumps'][checker][0] == String([i,l])){
+                                                        console.log("this is jumps available",place['jumps'][checker])
+                                                        for(let jump_checker=0; jump_checker < place["jumps"][checker][1].length; jump_checker++){
+                                                            document.getElementById(place["jumps"][checker][1][jump_checker]).style.backgroundColor = "blue"
+                                                            document.getElementById(place["jumps"][checker][1][jump_checker]).addEventListener('click', jumping)
+                                                            function jumping(){
+                                                                
+                                                                gameSocket.send(JSON.stringify({
+                                                                    "name": document.getElementById("name").innerHTML,
+                                                                    "roomid": document.getElementById("room").innerHTML,
+                                                                    "moved": [place["jumps"][checker][0], place["jumps"][checker][1]]
+                                                                }))
+                                                                loads+=1
+                                                                document.getElementById(place["jumps"][checker][1][jump_checker]).removeEventListener('click', jumping)
+                                                                
+                                                            }
                                                         }
-                                                    }
-                                                    
+                                                        
 
+                                                    }
                                                 }
                                             }
 
