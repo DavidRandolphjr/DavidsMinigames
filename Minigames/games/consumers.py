@@ -127,6 +127,7 @@ class MyConsumer(WebsocketConsumer):
         print("this could be a problem if this is triggering every time")
         # I am thinking we can let this be the final function
         if library[room.gamename].started == False:
+            print("its getting in here for some reason")
             if roomid and len(text_data_json) <=2:
                 team_owners = library[room.gamename].team_owner
                 if not name in team_owners:
