@@ -107,46 +107,50 @@ class Game:
             return ("these are the safe jumps", self.pos_at_risk)
         
     def safe_moves(self, who):
+        self.moves_safe = self.moves_available.copy()
         if who == self.playerone:
             for i in self.moves_available:
                 #check to see if spot ahead of moves_available is open.
                 if not [i[1][0] + 1, i[1][1] - 1] in self.playertwo and not [i[1][0] + 1, i[1][1] + 1] in self.playertwo:
-                    if not [i[1][0] - 1, i[1][1] - 1] in self.playertwo and not [i[1][0] - 1, i[1][1] - 1] in self.kings or [i[1][0] - 1, i[1][1] + 1] in self.playertwo and not [i[1][0] - 1, i[1][1] + 1] in self.kings:
-                        self.moves_safe.append(i)
-            for i in self.playerone:
+                    if [i[1][0] - 1, i[1][1] - 1] in self.playertwo and [i[1][0] - 1, i[1][1] - 1] in self.kings or [i[1][0] - 1, i[1][1] + 1] in self.playertwo and [i[1][0] - 1, i[1][1] + 1] in self.kings:
+                        if not i in self.moves_safe:
+                            self.moves_safe.remove(i)
 
-                if [i[0]+2,i[1]-2] in self.playertwo and not [i[0]+2,i[1]] in self.playertwo:
-
-                    if [i[0],i[1]-2] in self.openspaces:
-                        self.holes_exist.append([i, [i[0]+1,i[1]-1]])
-                if [i[0]+2,i[1]+2] in self.playertwo and not [i[0]+2,i[1]] in self.playertwo:
-
-                    if [i[0], i[1] + 2] in self.openspaces:
-                        self.holes_exist.append([i, [i[0]+1,i[1]+1]])
-            self.moves_safe.extend(self.holes_exist)
-            return ("safe moves",self.moves_safe)
-
+                        
+                if i[0][1] - i[1][1] <0:
+                    # checks moves to the right, so I only have to concern myself with moves in this direction
+                    if [i[1][0] +1, i[1][1]+1] in self.playertwo:
+                        self.moves_safe.remove(i)
+                    elif [i[1][0]+1,i[1][1]-1] in self.playertwo and not [i[1][0]-1,i[1][1]+1] in self.openspaces:
+                        self.moves_safe.remove(i)
+                else:
+                    if [i[1][0] +1, i[1][1]-1] in self.playertwo:
+                        self.moves_safe.remove(i)
+                    elif [i[1][0]+1,i[1][1]+1] in self.playertwo and not [i[1][0]-1,i[1][1]-1] in self.openspaces:
+                        self.moves_safe.remove(i)
+                        
         if who == self.playertwo:
             for i in self.moves_available:
                 #check to see if spot ahead of moves_available is open.
                 if not [i[1][0] - 1, i[1][1] - 1] in self.playerone and not [i[1][0] - 1, i[1][1] + 1] in self.playerone:
-                    if not [i[1][0] + 1, i[1][1] - 1] in self.playerone and not [i[1][0] + 1, i[1][1] - 1] in self.kings or [i[1][0] + 1, i[1][1] + 1] in self.playerone and not [i[1][0] + 1, i[1][1] + 1] in self.kings:
-                        self.moves_safe.append(i)
-                    self.moves_safe.append(i)
-            for i in self.playertwo:
+                    if [i[1][0] + 1, i[1][1] - 1] in self.playerone and [i[1][0] + 1, i[1][1] - 1] in self.kings or [i[1][0] + 1, i[1][1] + 1] in self.playerone and [i[1][0] + 1, i[1][1] + 1] in self.kings:
+                        if not i in self.moves_safe:
+                            self.moves_safe.remove(i)
 
-                if [i[0]-2,i[1]-2] in self.playerone and not [i[0]-2,i[1]] in self.playerone:
-
-                    if  [i[0],i[1]-2] in self.openspaces:
-                        print("triggers here",[i, [i[0]-1,i[1]-1]] )
-                        self.holes_exist.append([i, [i[0]-1,i[1]-1]])
-                if [i[0]-2,i[1]+2] in self.playerone and not [i[0]-2,i[1]] in self.playerone:
-
-                    if  [i[0], i[1] + 2] in self.openspaces:
-                        print("no here",[i, [i[0]-1,i[1]+1]] )
-                        self.holes_exist.append([i, [i[0]-1,i[1]+1]])
-            self.moves_safe.extend(self.holes_exist)
-            return ("safe moves",self.moves_safe)
+                        
+                if i[0][1] - i[1][1] <0:
+                    # checks moves to the right, so I only have to concern myself with moves in this direction
+                    if [i[1][0] -1, i[1][1]+1] in self.playerone:
+                        self.moves_safe.remove(i)
+                    elif [i[1][0]-1,i[1][1]-1] in self.playerone and not [i[1][0]-1,i[1][1]+1] in self.openspaces:
+                        self.moves_safe.remove(i)
+                else:
+                    if [i[1][0] -1, i[1][1]-1] in self.playerone:
+                        self.moves_safe.remove(i)
+                    elif [i[1][0]-1,i[1][1]+1] in self.playerone and not [i[1][0]-1,i[1][1]-1] in self.openspaces:
+                        self.moves_safe.remove(i)    
+           
+        return ("safe moves",self.moves_safe)
     def jumps(self, who):
         def one_jumps(pieces, one_ahead, two_ahead):
             if who == self.playerone:
@@ -239,7 +243,7 @@ class Game:
                         if not [i[0] + 1, i[1] + 1] in self.playertwo and i[0] + 1 <=7:
                             if not [i[0] + 1, i[1] - 1] in self.playertwo:
                                 if not [i[0] - 1, i[1] - 1] in self.playertwo and not [i[0] - 1,i[1] - 1] in self.kings or not [i[0] -1, i[1] + 1] in self.playertwo and not [i[0] - 1, i[1] + 1] in self.kings:
-                                    print([i[0] + 1, i[1] - 1], "not in playertwo ye")
+                                    print([i[0] - 1, i[1] - 1], "not in playertwo ye")
                                     safejump = thejump[1][:thejump[1].index(i) + 1]
                                     self.no_consequence_jump.append([thejump[0], safejump])
                             elif not [i[0] - 1, i[1] + 1] in self.openspaces:
@@ -266,28 +270,28 @@ class Game:
                 for i in thejump[1]:
                     if i[1] - current_jump[1] > 0:
                         # this means if the jump is to the right
-                        print("checking", [i[0] - 1, i[1] + 1])
-                        if not [i[0] - 1, i[1] + 1] in self.playertwo and i[0] + 1 <= 7:
-                            if not [i[0] - 1, i[1] - 1] in self.playertwo:
-                                if not [i[0] + 1, i[1] - 1] in self.playertwo and not [i[0] + 1,i[1] - 1] in self.kings or not [i[0] +1, i[1] + 1] in self.playertwo and not [i[0] + 1, i[1] + 1] in self.kings:
-                                    print([i[0] - 1, i[1] - 1], "not in playertwo ye")
-                                    safejump = thejump[1][:thejump[1].index(i) + 1]
+                        print("checking", [i[0] - 2, i[1] + 2])
+                        if not [i[0] - 2, i[1] + 2] in self.playerone and i[0] + 2 <= 7:
+                            if not [i[0] - 2, i[1] - 2] in self.playerone:
+                                if not [i[0] + 2, i[1] - 2] in self.playerone and not [i[0] + 2,i[1] - 2] in self.kings or not [i[0] +1, i[1] + 1] in self.playertwo and not [i[0] + 1, i[1] + 1] in self.kings:
+                                    print([i[0] - 2, i[1] - 2], "not in playerone ye")
+                                    safejump = thejump[1][:thejump[1].index(i) + 2]
                                     self.no_consequence_jump.append([thejump[0], safejump])
-                            elif not [i[0] + 1, i[1] + 1] in self.openspaces:
-                                print("this is also not in playertwo", [i[0] + 1, i[1] + 1])
-                                print([i[0] + 1, i[1] + 1], "not in open space sd")
-                                safejump = thejump[1][:thejump[1].index(i) + 1]
+                            elif not [i[0] + 2, i[1] + 2] in self.openspaces:
+                                print("this is also not in playerone", [i[0] + 2, i[1] + 2])
+                                print([i[0] + 2, i[1] + 2], "not in open space sd")
+                                safejump = thejump[1][:thejump[1].index(i) + 2]
                                 self.no_consequence_jump.append([thejump[0], safejump])
                     else:
-                        if not [i[0] - 1, i[1] - 1] in self.playertwo:
-                            if not [i[0] -1, i[1] + 1] in self.playertwo:
-                                if not [i[0] + 1, i[1] - 1] in self.playertwo and not [i[0] + 1,i[1] - 1] in self.kings or not [i[0] +1, i[1] + 1] in self.playertwo and not [i[0] + 1, i[1] + 1] in self.kings:
-                                    print([i[0] - 1, i[1] + 1], "not in playertwo ba")
-                                    safejump = thejump[1][:thejump[1].index(i) + 1]
+                        if not [i[0] - 2, i[1] - 2] in self.playerone:
+                            if not [i[0] -2, i[1] + 2] in self.playerone:
+                                if not [i[0] + 2, i[1] - 2] in self.playerone and not [i[0] + 2,i[1] - 2] in self.kings or not [i[0] +1, i[1] + 1] in self.playertwo and not [i[0] + 1, i[1] + 1] in self.kings:
+                                    print([i[0] - 2, i[1] + 2], "not in playerone ba")
+                                    safejump = thejump[1][:thejump[1].index(i) + 2]
                                     self.no_consequence_jump.append([thejump[0], safejump])
-                            elif not [i[0] + 1, i[1] - 1] in self.openspaces:
-                                print([i[0] + 1, i[1] - 1], "not in playertwo dv")
-                                safejump = thejump[1][:thejump[1].index(i) + 1]
+                            elif not [i[0] + 2, i[1] - 2] in self.openspaces:
+                                print([i[0] + 2, i[1] - 2], "not in playerone dv")
+                                safejump = thejump[1][:thejump[1].index(i) + 2]
                                 self.no_consequence_jump.append([thejump[0], safejump])
 
         if who == self.playertwo:
@@ -430,7 +434,7 @@ def checkers_game(current_instance, moved=None):
                 for j in game_instance.no_consequence_jump:
                     if i[0] == j[0]:
                         print("AI did a safe jump")
-                        game_instance.moved(j, current_instance.roomid)
+                        game_instance.moved([j[0],j[1]], current_instance.roomid)
                         taskfulfilled = True
                         break
                 if taskfulfilled == True:

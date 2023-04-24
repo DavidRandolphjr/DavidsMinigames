@@ -143,7 +143,7 @@ class MyConsumer(WebsocketConsumer):
                     'roomid': roomid
                     
                 }
-        ))
+            ))
         # we can pass a list by doing team_owners.split()
 
         # this is essentially here to just get the user to interact with the page

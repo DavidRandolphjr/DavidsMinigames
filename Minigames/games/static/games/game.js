@@ -280,29 +280,30 @@ function load_homepage(){
                         
                     })
                 }
-                let i =0;
-                while ( i< data.team_owners.length){
-                    console.log(data.team_owners)
-                    if(!document.getElementById("team_one").innerHTML.includes(data.team_owners[i])){
-                        document.getElementById("team_one").innerHTML += `
-                        <option value="${data.team_owners[i]}">${data.team_owners[i]}</option>
-                        `
-                        document.getElementById("team_two").innerHTML += `
-                        <option value="${data.team_owners[i]}">${data.team_owners[i]}</option>
-                        `
-                        
-                        
-                        
-                        if(data.team_owners[i] !="AI" ){
-                            document.getElementById("lobby_players").innerHTML += `
-                            ${data.team_owners[i]}
-                            <br>
+                else {
+                    while ( i< data.team_owners.length){
+                        console.log(data.team_owners)
+                        if(!document.getElementById("team_one").innerHTML.includes(data.team_owners[i])){
+                            document.getElementById("team_one").innerHTML += `
+                            <option value="${data.team_owners[i]}">${data.team_owners[i]}</option>
                             `
+                            document.getElementById("team_two").innerHTML += `
+                            <option value="${data.team_owners[i]}">${data.team_owners[i]}</option>
+                            `
+                            
+                            
+                            
+                            if(data.team_owners[i] !="AI" ){
+                                document.getElementById("lobby_players").innerHTML += `
+                                ${data.team_owners[i]}
+                                <br>
+                                `
+                            }
                         }
+                        i++;
                     }
-                    i++;
                 }
-
+                let i =0;
             })
 
 
