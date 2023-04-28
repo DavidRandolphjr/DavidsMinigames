@@ -56,13 +56,13 @@ function load_homepage(){
                                 alert(place["player_turn"] + " loses")
                             }
                             if (place["player_turn"] == "AI" && place["available_space"].length >0){
-                                setTimeout(function(){
-                                    gameSocket.send(JSON.stringify({
-                                        "name": document.getElementById("name").innerHTML,
-                                        "roomid": document.getElementById("room").innerHTML,
-                                        "AIturn": "Make AI Move"
-                                    }))
-                                }, 2000);
+                                
+                                gameSocket.send(JSON.stringify({
+                                    "name": document.getElementById("name").innerHTML,
+                                    "roomid": document.getElementById("room").innerHTML,
+                                    "AIturn": "Make AI Move"
+                                }))
+                                
                             }
                             for(let count=0; count < place['open_spaces'].length; count++){
                                 if(document.getElementById(place['open_spaces'][count]).innerHTML != ''){
@@ -274,13 +274,11 @@ function load_homepage(){
                         loads +=1
                     }
                     // not sure if this needs to be here at the moment
-                    fetch('/board/' + document.getElementById("room").innerHTML)
-                    .then(response => response.json())
-                    .then(placement =>{
-                        
-                    })
+
                 }
+                
                 else {
+                    let i =0;
                     while ( i< data.team_owners.length){
                         console.log(data.team_owners)
                         if(!document.getElementById("team_one").innerHTML.includes(data.team_owners[i])){
@@ -303,7 +301,7 @@ function load_homepage(){
                         i++;
                     }
                 }
-                let i =0;
+                
             })
 
 

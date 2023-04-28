@@ -4,14 +4,16 @@ from .models import Room, Checkers, Dice, Lobby
 from .models import User
 import ast
 import random
+import time
 
 class Game:
-    def __init__(self, playerone, playertwo, kings, roomid=None):
+    def __init__(self, playerone, playertwo, kings, who,roomid=None,):
         self.playerone = playerone
         self.playertwo = playertwo
         self.kings = kings
         self.openspaces = []
         self.roomid = roomid
+        self.who = who
         for i in range(0,8):
             for j in range(0,4):
                 k=j*2
@@ -31,7 +33,7 @@ class Game:
         #this is to see if a checker can slide inbetween checkers of playerone and playertwo
         self.holes_exist = []
         self.jumps_available=[]
-    def available_moves(self, who):
+    def available_moves(self):
         def one_moves(pieces):
             for i in pieces:
                 if [i[0]+1,i[1]-1] in self.openspaces:
@@ -40,7 +42,7 @@ class Game:
                 if [i[0]+1,i[1]+1] in self.openspaces:
                     
                     self.moves_available.append([i,[i[0]+1,i[1]+1]])
-                if who == self.playerone and i in self.kings:
+                if self.who == self.playerone and i in self.kings:
                     two_moves([i])
         def two_moves(pieces):
             for i in pieces:
@@ -50,14 +52,14 @@ class Game:
                 if [i[0]-1,i[1]+1] in self.openspaces:
 
                     self.moves_available.append([i,[i[0]-1,i[1]+1]])
-                if who == self.playertwo and i in self.kings:
+                if self.who == self.playertwo and i in self.kings:
                     one_moves([i])
 
         # have to change these
-        if who == self.playerone:
+        if self.who == self.playerone:
             one_moves(self.playerone)
 
-        if who == self.playertwo:
+        if self.who == self.playertwo:
             two_moves(self.playertwo)
 
 
@@ -65,18 +67,18 @@ class Game:
 
         return (self.moves_available)
     # this is going to be for the AI. I have not taken kings into account yet when determining safe moves
-    def in_danger(self, who):
+    def in_danger(self):
         exposures = []
         def at_risk(pieces, player):
             exposures = [] # counts the spot where an opposing checker could land with a jump
             # we could take this information and either have the player move another checker to cover the exposure
             # or we could try to move the checker safely out of the way if possible
             if player == "playerone":
-                print(pieces, )
+                
                 if [pieces[0]+1, pieces[1]-1] in self.playertwo and [pieces[0]-1, pieces[1]+1] in self.openspaces:
                     exposures.append([pieces[0]-1, pieces[1]+1])
                 if [pieces[0] + 1, pieces[1] + 1] in self.playertwo and [pieces[0] - 1, pieces[1] - 1] in self.openspaces:
-                    print("this triggered for ", pieces)
+                    
                     exposures.append([pieces[0] - 1, pieces[1] - 1])
                 if [pieces[0]-1, pieces[1] - 1] in self.playertwo and [pieces[0]-1, pieces[1] - 1] in self.kings and [pieces[0] + 1, pieces[1] + 1] in self.openspaces:
                     exposures.append([pieces[0] + 1, pieces[1] + 1])
@@ -93,27 +95,27 @@ class Game:
                     exposures.append([pieces[0] - 1, pieces[1] - 1])
             return exposures
 
-        if who == self.playertwo:
+        if self.who == self.playertwo:
             for i in self.playertwo:
 
                 if len(at_risk(i, "playertwo")) >0:
                     self.pos_at_risk.append([i, at_risk(i, "playertwo")])
             return ("these are the safe jumps", self.pos_at_risk)
 
-        if who == self.playerone:
+        if self.who == self.playerone:
             for i in self.playerone:
                 if len(at_risk(i, "playerone")) > 0:
                     self.pos_at_risk.append([i, at_risk(i, "playerone")])
             return ("these are the safe jumps", self.pos_at_risk)
         
-    def safe_moves(self, who):
+    def safe_moves(self):
         self.moves_safe = self.moves_available.copy()
-        if who == self.playerone:
+        if self.who == self.playerone:
             for i in self.moves_available:
                 #check to see if spot ahead of moves_available is open.
                 if not [i[1][0] + 1, i[1][1] - 1] in self.playertwo and not [i[1][0] + 1, i[1][1] + 1] in self.playertwo:
                     if [i[1][0] - 1, i[1][1] - 1] in self.playertwo and [i[1][0] - 1, i[1][1] - 1] in self.kings or [i[1][0] - 1, i[1][1] + 1] in self.playertwo and [i[1][0] - 1, i[1][1] + 1] in self.kings:
-                        if not i in self.moves_safe:
+                        if i in self.moves_safe:
                             self.moves_safe.remove(i)
 
                         
@@ -121,20 +123,20 @@ class Game:
                     # checks moves to the right, so I only have to concern myself with moves in this direction
                     if [i[1][0] +1, i[1][1]+1] in self.playertwo:
                         self.moves_safe.remove(i)
-                    elif [i[1][0]+1,i[1][1]-1] in self.playertwo and not [i[1][0]-1,i[1][1]+1] in self.openspaces:
+                    elif [i[1][0]+1,i[1][1]-1] in self.playertwo and [i[1][0]-1,i[1][1]+1] in self.openspaces:
                         self.moves_safe.remove(i)
                 else:
                     if [i[1][0] +1, i[1][1]-1] in self.playertwo:
                         self.moves_safe.remove(i)
-                    elif [i[1][0]+1,i[1][1]+1] in self.playertwo and not [i[1][0]-1,i[1][1]-1] in self.openspaces:
+                    elif [i[1][0]+1,i[1][1]+1] in self.playertwo and [i[1][0]-1,i[1][1]-1] in self.openspaces:
                         self.moves_safe.remove(i)
                         
-        if who == self.playertwo:
+        if self.who == self.playertwo:
             for i in self.moves_available:
                 #check to see if spot ahead of moves_available is open.
                 if not [i[1][0] - 1, i[1][1] - 1] in self.playerone and not [i[1][0] - 1, i[1][1] + 1] in self.playerone:
                     if [i[1][0] + 1, i[1][1] - 1] in self.playerone and [i[1][0] + 1, i[1][1] - 1] in self.kings or [i[1][0] + 1, i[1][1] + 1] in self.playerone and [i[1][0] + 1, i[1][1] + 1] in self.kings:
-                        if not i in self.moves_safe:
+                        if i in self.moves_safe:
                             self.moves_safe.remove(i)
 
                         
@@ -142,18 +144,18 @@ class Game:
                     # checks moves to the right, so I only have to concern myself with moves in this direction
                     if [i[1][0] -1, i[1][1]+1] in self.playerone:
                         self.moves_safe.remove(i)
-                    elif [i[1][0]-1,i[1][1]-1] in self.playerone and not [i[1][0]-1,i[1][1]+1] in self.openspaces:
+                    elif [i[1][0]-1,i[1][1]-1] in self.playerone and  [i[1][0]+1,i[1][1]+1] in self.openspaces:
                         self.moves_safe.remove(i)
                 else:
                     if [i[1][0] -1, i[1][1]-1] in self.playerone:
                         self.moves_safe.remove(i)
-                    elif [i[1][0]-1,i[1][1]+1] in self.playerone and not [i[1][0]-1,i[1][1]-1] in self.openspaces:
+                    elif [i[1][0]-1,i[1][1]+1] in self.playerone and  [i[1][0]+1,i[1][1]-1] in self.openspaces:
                         self.moves_safe.remove(i)    
            
         return ("safe moves",self.moves_safe)
-    def jumps(self, who):
+    def jumps(self):
         def one_jumps(pieces, one_ahead, two_ahead):
-            if who == self.playerone:
+            if self.who == self.playerone:
                 oposer = self.playertwo
             else:
                 oposer = self.playerone
@@ -220,17 +222,17 @@ class Game:
                 if i in self.kings and [i] != pieces:
                     one_jumps([i], one_ahead*-1,two_ahead*-1)
 
-        if who == self.playertwo:
+        if self.who == self.playertwo:
             one_jumps(self.playertwo, -1,-2)
 
-        if who == self.playerone:
+        if self.who == self.playerone:
             one_jumps(self.playerone, 1,2)
 
         return (self.jumps_available)
     
 
     # safe_jumps does not account for kings. To determine if a jump is safe against a king, we will just have to check if a king has a jump in the opposite direction
-    def safe_jumps(self, who):
+    def safe_jumps(self):
 
         def free_jump(thejump, player):
             if player == "playerone":
@@ -239,27 +241,27 @@ class Game:
 
                     if i[1] - current_jump[1] > 0:
                         # this means if the jump is to the right
-                        print("checking", [i[0] + 1, i[1] + 1])
+                        
                         if not [i[0] + 1, i[1] + 1] in self.playertwo and i[0] + 1 <=7:
                             if not [i[0] + 1, i[1] - 1] in self.playertwo:
                                 if not [i[0] - 1, i[1] - 1] in self.playertwo and not [i[0] - 1,i[1] - 1] in self.kings or not [i[0] -1, i[1] + 1] in self.playertwo and not [i[0] - 1, i[1] + 1] in self.kings:
-                                    print([i[0] - 1, i[1] - 1], "not in playertwo ye")
+                                    
                                     safejump = thejump[1][:thejump[1].index(i) + 1]
                                     self.no_consequence_jump.append([thejump[0], safejump])
                             elif not [i[0] - 1, i[1] + 1] in self.openspaces:
 
-                                print([i[0] - 1, i[1] + 1], "not in openspaces sd", self.openspaces)
+                                
                                 safejump = thejump[1][:thejump[1].index(i) + 1]
                                 self.no_consequence_jump.append([thejump[0], safejump])
                     else:
                         if not [i[0] + 1, i[1] - 1] in self.playertwo:
                             if not [i[0] +1 , i[1]  +1 ]  in self.playertwo:
                                 if not [i[0] - 1, i[1] - 1] in self.playertwo and not [i[0] - 1,i[1] - 1] in self.kings or not [i[0] - 1,i[1] + 1] in self.playertwo and not [i[0] - 1,i[1] + 1] in self.kings:
-                                    print([i[0] -1, i[1] + 1], "not in playertwo ba")
+                                    
                                     safejump = thejump[1][:thejump[1].index(i) + 1]
                                     self.no_consequence_jump.append([thejump[0], safejump])
                             elif not [i[0] - 1, i[1] - 1] in self.openspaces:
-                                print([i[0] - 1, i[1] - 1], "not in playertwo dv")
+                                
                                 safejump = thejump[1][:thejump[1].index(i) + 1]
                                 self.no_consequence_jump.append([thejump[0], safejump])
                     current_jump = i
@@ -268,50 +270,49 @@ class Game:
             if player == "playertwo":
                 current_jump = thejump[0]
                 for i in thejump[1]:
+                    
                     if i[1] - current_jump[1] > 0:
                         # this means if the jump is to the right
-                        print("checking", [i[0] - 2, i[1] + 2])
-                        if not [i[0] - 2, i[1] + 2] in self.playerone and i[0] + 2 <= 7:
-                            if not [i[0] - 2, i[1] - 2] in self.playerone:
-                                if not [i[0] + 2, i[1] - 2] in self.playerone and not [i[0] + 2,i[1] - 2] in self.kings or not [i[0] +1, i[1] + 1] in self.playertwo and not [i[0] + 1, i[1] + 1] in self.kings:
-                                    print([i[0] - 2, i[1] - 2], "not in playerone ye")
-                                    safejump = thejump[1][:thejump[1].index(i) + 2]
+                        
+                        if not [i[0] - 1, i[1] + 1] in self.playerone and i[0] + 1 <= 7:
+                            if not [i[0] - 1, i[1] - 1] in self.playerone:
+                                if not [i[0] + 1, i[1] - 1] in self.playerone and not [i[0] + 1,i[1] - 1] in self.kings or not [i[0] +1, i[1] + 1] in self.playertwo and not [i[0] + 1, i[1] + 1] in self.kings:
+                                    
+                                    safejump = thejump[1][:thejump[1].index(i) + 1]
                                     self.no_consequence_jump.append([thejump[0], safejump])
-                            elif not [i[0] + 2, i[1] + 2] in self.openspaces:
-                                print("this is also not in playerone", [i[0] + 2, i[1] + 2])
-                                print([i[0] + 2, i[1] + 2], "not in open space sd")
-                                safejump = thejump[1][:thejump[1].index(i) + 2]
+                            elif not [i[0] + 1, i[1] + 1] in self.openspaces:
+                                
+                                safejump = thejump[1][:thejump[1].index(i) + 1]
                                 self.no_consequence_jump.append([thejump[0], safejump])
                     else:
-                        if not [i[0] - 2, i[1] - 2] in self.playerone:
-                            if not [i[0] -2, i[1] + 2] in self.playerone:
-                                if not [i[0] + 2, i[1] - 2] in self.playerone and not [i[0] + 2,i[1] - 2] in self.kings or not [i[0] +1, i[1] + 1] in self.playertwo and not [i[0] + 1, i[1] + 1] in self.kings:
-                                    print([i[0] - 2, i[1] + 2], "not in playerone ba")
-                                    safejump = thejump[1][:thejump[1].index(i) + 2]
+                        if not [i[0] - 1, i[1] - 1] in self.playerone:
+                            if not [i[0] -1, i[1] + 1] in self.playerone:
+                                if not [i[0] + 1, i[1] - 1] in self.playerone and not [i[0] + 1,i[1] - 1] in self.kings or not [i[0] +1, i[1] + 1] in self.playertwo and not [i[0] + 1, i[1] + 1] in self.kings:
+                                    
+                                    safejump = thejump[1][:thejump[1].index(i) + 1]
                                     self.no_consequence_jump.append([thejump[0], safejump])
-                            elif not [i[0] + 2, i[1] - 2] in self.openspaces:
-                                print([i[0] + 2, i[1] - 2], "not in playerone dv")
-                                safejump = thejump[1][:thejump[1].index(i) + 2]
+                            elif not [i[0] + 1, i[1] - 1] in self.openspaces:
+                                
+                                safejump = thejump[1][:thejump[1].index(i) + 1]
                                 self.no_consequence_jump.append([thejump[0], safejump])
 
-        if who == self.playertwo:
+        if self.who == self.playertwo:
             for i in self.jumps_available:
                 free_jump(i, "playertwo")
             return ("these are the safe jumps", self.no_consequence_jump)
 
-        if who == self.playerone:
+        if self.who == self.playerone:
             for i in self.jumps_available:
                 free_jump(i, "playerone")
             return ("these are the safe jumps", self.no_consequence_jump)
     def moved(self, where, roomid):
         
-        print("this is what where[1] is equal to", where[1])
-        print("this is what where is equal to", where)
+        
         where[1]=where[1][:where[1].index(where[1][-1])+1]
         
 
         self.roomid = roomid
-        first_player = self.playerone
+        first_player = self.playerone.copy()
         
 
         
@@ -321,7 +322,8 @@ class Game:
         # Figure out who's turn it is
         player_turn = the_game.team_owner.split()
         player_turns = len(player_turn)
-        if player_turn.index(the_game.turn) < player_turns -1:
+        if self.who == self.playerone:
+            
             first_player[first_player.index(where[0])] = where[1][-1]
             if where[0] in kinged:
                 kinged[kinged.index(where[0])] = where[1][-1]
@@ -336,7 +338,7 @@ class Game:
                     the_game.kings = str(kinged)
         else:
             next_turn = player_turn[0]
-            first_player = self.playertwo
+            first_player = self.playertwo.copy()
             first_player[first_player.index(where[0])] = where[1][-1]
             if where[0] in kinged:
                 kinged[kinged.index(where[0])] = where[1][-1]
@@ -355,59 +357,59 @@ class Game:
         for i in range(0, len(listy)-1):
 
             if abs(last_value[1] -listy[i+1][1]) ==2 and abs(last_value[0] -listy[i+1][0]) ==2:
-                print("appended", listy[i+1], "because last value is", last_value)
+                
                 newlist.append(listy[i+1])
                 last_value = listy[i+1]
         where[1]=newlist[::-1]
-        print("after changes, this is where[1]", where[1])
+        
         temp_value = where[0]
         
         
         for i in where[1]:
             #here lies the problem. Jumped doesnt put the right thing for double jumps
-            print(where, i, where[1])
+            
             # the issue lies here for the second jump
             jumped = [int(abs(temp_value[0]+i[0])/2), int(abs(temp_value[1]+i[1])/2)]
             temp_value = i
-            print("checker that was jumped", jumped)
+            
             try:
-                print(checker_removal)
+                
                 checker_delete =ast.literal_eval(checker_removal)
                 checker_delete.remove(jumped)
                 checker_delete = str(checker_delete)
-                print("if it made it here, then Im stumped", checker_delete)
+                
                 checker_removal= checker_delete
                 
                 
             except:
                 pass
         
-        if player_turn.index(the_game.turn) < player_turns -1:
-
+        if self.who == self.playertwo:
+            
             the_game.player_one = checker_removal
         else:
-
+            
             the_game.player_two = checker_removal
         
         the_game.save()
         print("__________________________________________________")
 
 # Im gonna have to include jumps
-def checkers_game(current_instance, moved=None):
+def checkers_game(current_instance, moved=None, aiturn=None):
     player_instance = current_instance.player_one
-    team_owner = current_instance.team_owner.split()
-    if team_owner.index(current_instance.turn) >0:
+    
+    if current_instance.turn == "AI":
 
         player_instance = current_instance.player_two
 
-    game_instance = Game(ast.literal_eval(current_instance.player_one), ast.literal_eval(current_instance.player_two), ast.literal_eval(current_instance.kings), current_instance.roomid)
-    game_instance.available_moves(ast.literal_eval(player_instance))
-    game_instance.in_danger(ast.literal_eval(player_instance))
-    game_instance.safe_moves(ast.literal_eval(player_instance))
-    game_instance.jumps(ast.literal_eval(player_instance))
-    game_instance.safe_jumps(ast.literal_eval(player_instance))
-
-    if current_instance.turn == "AI":
+    game_instance = Game(ast.literal_eval(current_instance.player_one), ast.literal_eval(current_instance.player_two), ast.literal_eval(current_instance.kings),ast.literal_eval(player_instance), current_instance.roomid)
+    game_instance.available_moves()
+    game_instance.in_danger()
+    game_instance.safe_moves()
+    game_instance.jumps()
+    game_instance.safe_jumps()
+    print("this is who's turn it is %s" % current_instance.turn )
+    if aiturn:
         
         print("we made it all the way here", player_instance)
         print("moves available",game_instance.moves_available)
@@ -433,7 +435,7 @@ def checkers_game(current_instance, moved=None):
                 # sub-priority one, perform safe jump with at risk checker if possible
                 for j in game_instance.no_consequence_jump:
                     if i[0] == j[0]:
-                        print("AI did a safe jump")
+                        print("AI did a safe jump", [j[0],j[1]])
                         game_instance.moved([j[0],j[1]], current_instance.roomid)
                         taskfulfilled = True
                         break
@@ -442,29 +444,71 @@ def checkers_game(current_instance, moved=None):
                 # sub-priority two, perform safe move with at risk checker if possible
                 for k in game_instance.moves_safe:
                     if i[0] == k[0]:
-                        print("AI did a safe move")
+                        print("AI did a safe move",[k[0],[k[1]]])
                         game_instance.moved([k[0],[k[1]]], current_instance.roomid)
                         taskfulfilled = True
                         break
                     # sub-priority three, cover at risk spot with another checker
                     if k[1] in i[1]:
-                        print("AI did a block move")
+                        print("AI did a block move",[k[0],[k[1]]])
                         game_instance.moved([k[0],[k[1]]], current_instance.roomid)
                         taskfulfilled = True
                         break
+                if taskfulfilled == False:
+                    if len(game_instance.no_consequence_jump)>0:
+                        
+                        rand_num =len(game_instance.no_consequence_jump)-1
+                        print("SAFE JUMP HAPPENED",[game_instance.no_consequence_jump[rand_num][0],game_instance.no_consequence_jump[rand_num][1]])
+                        game_instance.moved([game_instance.no_consequence_jump[rand_num][0],game_instance.no_consequence_jump[rand_num][1]], current_instance.roomid)
+                    elif len(game_instance.moves_safe)>0:
+                        
+                        rand_num =len(game_instance.moves_safe)-1
+                        print("SAFE MOVE CHOSEN", [game_instance.moves_safe[rand_num][0],[game_instance.moves_safe[rand_num][1]]])
+                        game_instance.moved([game_instance.moves_safe[rand_num][0],[game_instance.moves_safe[rand_num][1]]], current_instance.roomid)
+                        taskfulfilled = True
+                        
+                    elif len(game_instance.jumps_available)>0:
+                        
+                        rand_num =len(game_instance.jumps_available)-1
+                        print("RANDOM JUMP HERE",[game_instance.jumps_available[rand_num][0],[game_instance.jumps_available[rand_num][1]]])
+                        game_instance.moved([game_instance.jumps_available[rand_num][0],[game_instance.jumps_available[rand_num][1]]], current_instance.roomid)
+                        taskfulfilled = True
+                        
+                    # priority five, make random move
+                    else:
+                        
+                        rand_num =len(game_instance.moves_available)-1
+                        print("RANDOM MOVE SELECTED", [game_instance.moves_available[rand_num][0],[game_instance.moves_available[rand_num][1]]])
+                        game_instance.moved([game_instance.moves_available[rand_num][0],[game_instance.moves_available[rand_num][1]]], current_instance.roomid)
+                        taskfulfilled = True
+                else:
+                    break
+                    
                 if taskfulfilled == True:
                     break
+        # make safe jump
+        elif len(game_instance.no_consequence_jump)>0:
+            
+            rand_num =len(game_instance.no_consequence_jump)-1
+            print("SAFE JUMP HAPPENED", [game_instance.no_consequence_jump[rand_num][0],game_instance.no_consequence_jump[rand_num][1]])
+            game_instance.moved([game_instance.no_consequence_jump[rand_num][0],game_instance.no_consequence_jump[rand_num][1]], current_instance.roomid)
         # priority three, make random safe move
         elif len(game_instance.moves_safe)>0:
+            
             rand_num =len(game_instance.moves_safe)-1
+            print("SAFE MOVE HAPPENED", [game_instance.moves_safe[rand_num][0],[game_instance.moves_safe[rand_num][1]]])
             game_instance.moved([game_instance.moves_safe[rand_num][0],[game_instance.moves_safe[rand_num][1]]], current_instance.roomid)
         # priority four, make random jump
         elif len(game_instance.jumps_available)>0:
+            
             rand_num =len(game_instance.jumps_available)-1
+            print("REGULAR JUMP", [game_instance.jumps_available[rand_num][0],[game_instance.jumps_available[rand_num][1]]])
             game_instance.moved([game_instance.jumps_available[rand_num][0],[game_instance.jumps_available[rand_num][1]]], current_instance.roomid)
         # priority five, make random move
         else:
+            
             rand_num =len(game_instance.moves_available)-1
+            print("RANDOM MOVE TIME", [game_instance.moves_available[rand_num][0],[game_instance.moves_available[rand_num][1]]])
             game_instance.moved([game_instance.moves_available[rand_num][0],[game_instance.moves_available[rand_num][1]]], current_instance.roomid)
         
         # the ai is gonna have to know when its in danger and how to get out of it.
@@ -477,7 +521,7 @@ def checkers_game(current_instance, moved=None):
         "player_one": ast.literal_eval(current_instance.player_one), 
         "player_two": ast.literal_eval(current_instance.player_two), 
         "kings": ast.literal_eval(current_instance.kings),
-        "available_space": game_instance.available_moves(ast.literal_eval(player_instance)), #at the moment we are only catering to player one
+        "available_space": game_instance.available_moves(), #at the moment we are only catering to player one
         "jumps": game_instance.jumps_available,
         "open_spaces": game_instance.openspaces ,
         "player_turn": current_instance.turn,
