@@ -1,6 +1,7 @@
 import json
 import random
 import ast
+import time
 from channels.generic.websocket import WebsocketConsumer
 from asgiref.sync import async_to_sync
 from django.http import JsonResponse, HttpResponse, HttpResponseRedirect
@@ -46,15 +47,15 @@ class MyConsumer(WebsocketConsumer):
             start_game = text_data_json['started']
             team_one = text_data_json['team_one']
             team_two = text_data_json['team_two']
-            print("we have made it to here")
+            
             
             #dice = Dice.objects.get(roomid=room)
-            
+            print("this is the triggering area")
             library[room.gamename].started = True
             library[room.gamename].team_owner = str(team_one)+ " " +str(team_two)
             player_turn = library[room.gamename].team_owner.split()
             library[room.gamename].turn = player_turn[0]
-            print("we made it this far as well")
+            
             library[room.gamename].save()
             # not sure if we need to send 'team_owners', but we will for now
             return(async_to_sync(self.channel_layer.group_send)(
@@ -74,6 +75,7 @@ class MyConsumer(WebsocketConsumer):
         
 
         #
+
         try:
             # once we implement turns, we are going to have to specify here who made what move. I think we can just ask the instance's database for the turn. such as Checkers.objects.get(roomid=roomid).turn
             # While this current solution works, I am thinking that we redo this so that gameplay.py handles this. I think that makes this more readable, but could also simplify things.
@@ -84,8 +86,9 @@ class MyConsumer(WebsocketConsumer):
                 #"Dice":dice
             }
             moved = text_data_json['moved']
+            print(moved)
             
-            print("this is the move", moved)
+            
 
             games_start[room.gamename](library[room.gamename], moved)
 
@@ -112,8 +115,8 @@ class MyConsumer(WebsocketConsumer):
             
             print("Its AI time", AIturn)
 
-            games_start[room.gamename](library[room.gamename])
-
+            games_start[room.gamename](library[room.gamename], None, "aiturn")
+            time.sleep(1)
             return(async_to_sync(self.channel_layer.group_send)(
             self.room_group_name,
             {
@@ -124,10 +127,10 @@ class MyConsumer(WebsocketConsumer):
             }))
         except:
             pass
-        print("this could be a problem if this is triggering every time")
+        
         # I am thinking we can let this be the final function
         if library[room.gamename].started == False:
-            print("its getting in here for some reason")
+
             if roomid and len(text_data_json) <=2:
                 team_owners = library[room.gamename].team_owner
                 if not name in team_owners:
@@ -143,7 +146,7 @@ class MyConsumer(WebsocketConsumer):
                     'roomid': roomid
                     
                 }
-        ))
+            ))
         # we can pass a list by doing team_owners.split()
 
         # this is essentially here to just get the user to interact with the page

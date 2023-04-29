@@ -40,7 +40,7 @@ def game(request, gamename=None ,id=None, name=None):
 
     if id and name != "empty":
         try:
-
+            # i can create another library dictionary that changes the html that the user gets redirected to
             room = Room.objects.get(id=id, name=name)
             return render(request, "games/game.html", {"room": room.id, "name": request.user, "gamename": gamename})
         except Room.DoesNotExist:

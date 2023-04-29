@@ -14,10 +14,7 @@ const gameSocket = new WebSocket(url)
 function load_homepage(){
     var loads = 0
     var modal = document.getElementById("myModal");
-    var span = document.getElementsByClassName("close")[0];
-    span.onclick = function() {
-        modal.style.display = "none";
-    }
+    
     
       
     // since gameSocket creates another instance once it receives data, perhaps I can have gameSocket update an already established javascript.
@@ -56,13 +53,13 @@ function load_homepage(){
                                 alert(place["player_turn"] + " loses")
                             }
                             if (place["player_turn"] == "AI" && place["available_space"].length >0){
-                                setTimeout(function(){
-                                    gameSocket.send(JSON.stringify({
-                                        "name": document.getElementById("name").innerHTML,
-                                        "roomid": document.getElementById("room").innerHTML,
-                                        "AIturn": "Make AI Move"
-                                    }))
-                                }, 2000);
+                                
+                                gameSocket.send(JSON.stringify({
+                                    "name": document.getElementById("name").innerHTML,
+                                    "roomid": document.getElementById("room").innerHTML,
+                                    "AIturn": "Make AI Move"
+                                }))
+                                
                             }
                             for(let count=0; count < place['open_spaces'].length; count++){
                                 if(document.getElementById(place['open_spaces'][count]).innerHTML != ''){
@@ -274,35 +271,34 @@ function load_homepage(){
                         loads +=1
                     }
                     // not sure if this needs to be here at the moment
-                    fetch('/board/' + document.getElementById("room").innerHTML)
-                    .then(response => response.json())
-                    .then(placement =>{
-                        
-                    })
-                }
-                let i =0;
-                while ( i< data.team_owners.length){
-                    console.log(data.team_owners)
-                    if(!document.getElementById("team_one").innerHTML.includes(data.team_owners[i])){
-                        document.getElementById("team_one").innerHTML += `
-                        <option value="${data.team_owners[i]}">${data.team_owners[i]}</option>
-                        `
-                        document.getElementById("team_two").innerHTML += `
-                        <option value="${data.team_owners[i]}">${data.team_owners[i]}</option>
-                        `
-                        
-                        
-                        
-                        if(data.team_owners[i] !="AI" ){
-                            document.getElementById("lobby_players").innerHTML += `
-                            ${data.team_owners[i]}
-                            <br>
-                            `
-                        }
-                    }
-                    i++;
-                }
 
+                }
+                
+                else {
+                    let i =0;
+                    while ( i< data.team_owners.length){
+                        console.log(data.team_owners)
+                        if(!document.getElementById("team_one").innerHTML.includes(data.team_owners[i])){
+                            document.getElementById("team_one").innerHTML += `
+                            <option value="${data.team_owners[i]}">${data.team_owners[i]}</option>
+                            `
+                            document.getElementById("team_two").innerHTML += `
+                            <option value="${data.team_owners[i]}">${data.team_owners[i]}</option>
+                            `
+                            
+                            
+                            
+                            if(data.team_owners[i] !="AI" ){
+                                document.getElementById("lobby_players").innerHTML += `
+                                ${data.team_owners[i]}
+                                <br>
+                                `
+                            }
+                        }
+                        i++;
+                    }
+                }
+                
             })
 
 
