@@ -14,10 +14,7 @@ const gameSocket = new WebSocket(url)
 function load_homepage(){
     var loads = 0
     var modal = document.getElementById("myModal");
-    var span = document.getElementsByClassName("close")[0];
-    span.onclick = function() {
-        modal.style.display = "none";
-    }
+    
     
       
     // since gameSocket creates another instance once it receives data, perhaps I can have gameSocket update an already established javascript.
