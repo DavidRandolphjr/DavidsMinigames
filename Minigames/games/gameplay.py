@@ -112,47 +112,29 @@ class Game:
         self.moves_safe = self.moves_available.copy()
         if self.who == self.playerone:
             for i in self.moves_available:
-                #check to see if spot ahead of moves_available is open.
-                if not [i[1][0] + 1, i[1][1] - 1] in self.playertwo and not [i[1][0] + 1, i[1][1] + 1] in self.playertwo:
-                    if [i[1][0] - 1, i[1][1] - 1] in self.playertwo and [i[1][0] - 1, i[1][1] - 1] in self.kings or [i[1][0] - 1, i[1][1] + 1] in self.playertwo and [i[1][0] - 1, i[1][1] + 1] in self.kings:
-                        if i in self.moves_safe:
-                            self.moves_safe.remove(i)
-
-                        
-                if i[0][1] - i[1][1] <0:
-                    # checks moves to the right, so I only have to concern myself with moves in this direction
-                    if [i[1][0] +1, i[1][1]+1] in self.playertwo:
-                        self.moves_safe.remove(i)
-                    elif [i[1][0]+1,i[1][1]-1] in self.playertwo and [i[1][0]-1,i[1][1]+1] in self.openspaces:
-                        self.moves_safe.remove(i)
-                else:
-                    if [i[1][0] +1, i[1][1]-1] in self.playertwo:
-                        self.moves_safe.remove(i)
-                    elif [i[1][0]+1,i[1][1]+1] in self.playertwo and [i[1][0]-1,i[1][1]-1] in self.openspaces:
-                        self.moves_safe.remove(i)
-                        
+                temp_playerone = self.playerone.copy()
+                temp_playerone.remove(i[0])
+                temp_playerone.append(i[1])
+                is_move_safe = Game(temp_playerone, self.playertwo, self.kings,temp_playerone, None)
+                is_move_safe.in_danger()
+                if len(self.pos_at_risk) <= len(is_move_safe.pos_at_risk):
+                    self.moves_safe.remove(i)
+                
         if self.who == self.playertwo:
+            
             for i in self.moves_available:
-                #check to see if spot ahead of moves_available is open.
-                if not [i[1][0] - 1, i[1][1] - 1] in self.playerone and not [i[1][0] - 1, i[1][1] + 1] in self.playerone:
-                    if [i[1][0] + 1, i[1][1] - 1] in self.playerone and [i[1][0] + 1, i[1][1] - 1] in self.kings or [i[1][0] + 1, i[1][1] + 1] in self.playerone and [i[1][0] + 1, i[1][1] + 1] in self.kings:
-                        if i in self.moves_safe:
-                            self.moves_safe.remove(i)
+                temp_playertwo = self.playertwo.copy()
+                temp_playertwo.remove(i[0])
+                temp_playertwo.append(i[1])
+                is_move_safe = Game(self.playerone, temp_playertwo, self.kings,temp_playertwo, None)
+                is_move_safe.in_danger()
+                
+                if self.pos_at_risk != is_move_safe.pos_at_risk:
+                    if len(self.pos_at_risk) <= len(is_move_safe.pos_at_risk):
 
                         
-                if i[0][1] - i[1][1] <0:
-                    # checks moves to the right, so I only have to concern myself with moves in this direction
-                    if [i[1][0] -1, i[1][1]+1] in self.playerone:
-                        self.moves_safe.remove(i)
-                    elif [i[1][0]-1,i[1][1]-1] in self.playerone and  [i[1][0]+1,i[1][1]+1] in self.openspaces:
-                        self.moves_safe.remove(i)
-                else:
-                    if [i[1][0] -1, i[1][1]-1] in self.playerone:
-                        self.moves_safe.remove(i)
-                    elif [i[1][0]-1,i[1][1]+1] in self.playerone and  [i[1][0]+1,i[1][1]-1] in self.openspaces:
-                        self.moves_safe.remove(i)    
-           
-        return ("safe moves",self.moves_safe)
+                        self.moves_safe.remove(i) 
+                        
     def jumps(self):
         def one_jumps(pieces, one_ahead, two_ahead):
             if self.who == self.playerone:
@@ -233,77 +215,126 @@ class Game:
 
     # safe_jumps does not account for kings. To determine if a jump is safe against a king, we will just have to check if a king has a jump in the opposite direction
     def safe_jumps(self):
-
-        def free_jump(thejump, player):
-            if player == "playerone":
-                current_jump = thejump[0]
-                for i in thejump[1]:
-
-                    if i[1] - current_jump[1] > 0:
-                        # this means if the jump is to the right
-                        
-                        if not [i[0] + 1, i[1] + 1] in self.playertwo and i[0] + 1 <=7:
-                            if not [i[0] + 1, i[1] - 1] in self.playertwo:
-                                if not [i[0] - 1, i[1] - 1] in self.playertwo and not [i[0] - 1,i[1] - 1] in self.kings or not [i[0] -1, i[1] + 1] in self.playertwo and not [i[0] - 1, i[1] + 1] in self.kings:
-                                    
-                                    safejump = thejump[1][:thejump[1].index(i) + 1]
-                                    self.no_consequence_jump.append([thejump[0], safejump])
-                            elif not [i[0] - 1, i[1] + 1] in self.openspaces:
-
-                                
-                                safejump = thejump[1][:thejump[1].index(i) + 1]
-                                self.no_consequence_jump.append([thejump[0], safejump])
-                    else:
-                        if not [i[0] + 1, i[1] - 1] in self.playertwo:
-                            if not [i[0] +1 , i[1]  +1 ]  in self.playertwo:
-                                if not [i[0] - 1, i[1] - 1] in self.playertwo and not [i[0] - 1,i[1] - 1] in self.kings or not [i[0] - 1,i[1] + 1] in self.playertwo and not [i[0] - 1,i[1] + 1] in self.kings:
-                                    
-                                    safejump = thejump[1][:thejump[1].index(i) + 1]
-                                    self.no_consequence_jump.append([thejump[0], safejump])
-                            elif not [i[0] - 1, i[1] - 1] in self.openspaces:
-                                
-                                safejump = thejump[1][:thejump[1].index(i) + 1]
-                                self.no_consequence_jump.append([thejump[0], safejump])
-                    current_jump = i
-
-
-            if player == "playertwo":
-                current_jump = thejump[0]
-                for i in thejump[1]:
-                    
-                    if i[1] - current_jump[1] > 0:
-                        # this means if the jump is to the right
-                        
-                        if not [i[0] - 1, i[1] + 1] in self.playerone and i[0] + 1 <= 7:
-                            if not [i[0] - 1, i[1] - 1] in self.playerone:
-                                if not [i[0] + 1, i[1] - 1] in self.playerone and not [i[0] + 1,i[1] - 1] in self.kings or not [i[0] +1, i[1] + 1] in self.playertwo and not [i[0] + 1, i[1] + 1] in self.kings:
-                                    
-                                    safejump = thejump[1][:thejump[1].index(i) + 1]
-                                    self.no_consequence_jump.append([thejump[0], safejump])
-                            elif not [i[0] + 1, i[1] + 1] in self.openspaces:
-                                
-                                safejump = thejump[1][:thejump[1].index(i) + 1]
-                                self.no_consequence_jump.append([thejump[0], safejump])
-                    else:
-                        if not [i[0] - 1, i[1] - 1] in self.playerone:
-                            if not [i[0] -1, i[1] + 1] in self.playerone:
-                                if not [i[0] + 1, i[1] - 1] in self.playerone and not [i[0] + 1,i[1] - 1] in self.kings or not [i[0] +1, i[1] + 1] in self.playertwo and not [i[0] + 1, i[1] + 1] in self.kings:
-                                    
-                                    safejump = thejump[1][:thejump[1].index(i) + 1]
-                                    self.no_consequence_jump.append([thejump[0], safejump])
-                            elif not [i[0] + 1, i[1] - 1] in self.openspaces:
-                                
-                                safejump = thejump[1][:thejump[1].index(i) + 1]
-                                self.no_consequence_jump.append([thejump[0], safejump])
-
-        if self.who == self.playertwo:
-            for i in self.jumps_available:
-                free_jump(i, "playertwo")
-            return ("these are the safe jumps", self.no_consequence_jump)
-
+        first_player = self.playerone.copy()
+        self.no_consequence_jump = self.jumps_available.copy()
+        kinged = self.kings.copy()
+        print("THIS IS FIRST_PLAYER THOUGH", first_player)
         if self.who == self.playerone:
             for i in self.jumps_available:
-                free_jump(i, "playerone")
+                first_player[first_player.index(i[0])] = i[1][-1]
+                if i[0] in kinged:
+                    kinged[kinged.index(i[0])] = i[1][-1]
+                checker_removal = self.playertwo.copy()
+                
+                if i[1][-1][0] == 7:
+                    if not i[1][-1] in kinged:
+                        kinged.append(i[1][-1])
+                # this little function right here is to specify the jumps that are being made. The aim is to eliminate a jump option if there are two jumps present on the same row.
+                listy = i[1][::-1]
+                newlist = [listy[0]]
+                last_value = listy[0]
+                for j in range(0, len(listy)-1):
+
+                    if abs(last_value[1] -listy[j+1][1]) ==2 and abs(last_value[0] -listy[j+1][0]) ==2:
+                        
+                        newlist.append(listy[j+1])
+                        last_value = listy[j+1]
+                i[1]=newlist[::-1]
+                
+                temp_value = i[0]
+                
+                
+                for j in i[1]:
+                    #here lies the problem. Jumped doesnt put the right thing for double jumps
+                    
+                    # the issue lies here for the second jump
+                    jumped = [int(abs(temp_value[0]+j[0])/2), int(abs(temp_value[1]+j[1])/2)]
+                    temp_value = j
+                    
+                    try:
+                        
+                        checker_delete =ast.literal_eval(checker_removal)
+                        checker_delete.remove(jumped)
+                        checker_delete = checker_delete
+                        
+                        checker_removal= checker_delete
+                        
+                        
+                    except:
+                        pass
+                
+                
+                temp_player_two = checker_removal
+                is_jump_safe = Game(first_player, temp_player_two, kinged,first_player, None)
+                is_jump_safe.in_danger()
+                if self.pos_at_risk <= is_jump_safe.pos_at_risk:
+                    self.no_consequence_jump.remove(i)
+        else:
+            for i in self.jumps_available:
+                first_player = self.playertwo.copy()
+                first_player[first_player.index(i[0])] = i[1][-1]
+                if i[0] in kinged:
+                    kinged[kinged.index(i[0])] = i[1][-1]
+                    
+                checker_removal = self.playerone.copy()
+                
+                if i[1][-1][0] == 0:
+                    if not i[1][-1] in kinged:
+                        kinged.append(i[1][-1])
+                listy = i[1][::-1]
+                newlist = [listy[0]]
+                last_value = listy[0]
+                for j in range(0, len(listy)-1):
+
+                    if abs(last_value[1] -listy[j+1][1]) ==2 and abs(last_value[0] -listy[j+1][0]) ==2:
+                        
+                        newlist.append(listy[j+1])
+                        last_value = listy[j+1]
+                i[1]=newlist[::-1]
+                
+                temp_value = i[0]
+                
+                
+                for j in i[1]:
+                    #here lies the problem. Jumped doesnt put the right thing for double jumps
+                    
+                    # the issue lies here for the second jump
+                    jumped = [int(abs(temp_value[0]+j[0])/2), int(abs(temp_value[1]+j[1])/2)]
+                    temp_value = j
+                    
+                    try:
+                        
+                        checker_delete =checker_removal
+                        checker_delete.remove(jumped)
+                        
+                        
+                        checker_removal= checker_delete
+                        
+                        
+                    except:
+                        pass
+                
+                if self.who == self.playertwo:
+                    
+                    temp_player_one = checker_removal
+                else:
+                    
+                    temp_player_two = checker_removal
+                temp_player_one = checker_removal
+                
+                is_jump_safe = Game(temp_player_one, first_player, kinged,first_player, None)
+                is_jump_safe.in_danger()
+                
+                if self.pos_at_risk != is_jump_safe.pos_at_risk:
+                    if len(self.pos_at_risk) <= len(is_jump_safe.pos_at_risk):
+                        
+                        self.no_consequence_jump.remove(i)
+                else:
+                    pass
+        
+                        
+        
+                
             return ("these are the safe jumps", self.no_consequence_jump)
     def moved(self, where, roomid):
         
@@ -404,13 +435,13 @@ def checkers_game(current_instance, moved=None, aiturn=None):
 
     game_instance = Game(ast.literal_eval(current_instance.player_one), ast.literal_eval(current_instance.player_two), ast.literal_eval(current_instance.kings),ast.literal_eval(player_instance), current_instance.roomid)
     game_instance.available_moves()
-    game_instance.in_danger()
-    game_instance.safe_moves()
     game_instance.jumps()
-    game_instance.safe_jumps()
     print("this is who's turn it is %s" % current_instance.turn )
     if aiturn:
         
+        game_instance.in_danger()
+        game_instance.safe_moves()
+        game_instance.safe_jumps()
         print("we made it all the way here", player_instance)
         print("moves available",game_instance.moves_available)
         print("safe moves", game_instance.moves_safe)
@@ -419,15 +450,19 @@ def checkers_game(current_instance, moved=None, aiturn=None):
         print("jumps",game_instance.jumps_available )
         taskfulfilled = False
         # there are values in maxjump so that the if condition does not give an error
-        maxjump = [[1,0],[[1,0]]]
-        # priority one, make multi-jump
+        max_len = -1
+        res = [1,[1]]
         if len(game_instance.jumps_available)>0:
-            maxjump = max((x for x in game_instance.jumps_available))
+            for ele in game_instance.jumps_available:
+
+                if len(ele[1]) > max_len:
+                    max_len = len(ele[1])
+                    res = ele
         
         
-        if len(maxjump[1])>1:
+        if len(res[1])>1:
             print("AI made multi-jump")
-            game_instance.moved(maxjump, current_instance.roomid)
+            game_instance.moved(res, current_instance.roomid)
         # priority two, get checkers out of risk
         elif len(game_instance.pos_at_risk) >0:
              
@@ -502,7 +537,7 @@ def checkers_game(current_instance, moved=None, aiturn=None):
         elif len(game_instance.jumps_available)>0:
             
             rand_num =len(game_instance.jumps_available)-1
-            print("REGULAR JUMP", [game_instance.jumps_available[rand_num][0],[game_instance.jumps_available[rand_num][1]]])
+            print("REGULAR JUMP", [game_instance.jumps_available[rand_num][0],game_instance.jumps_available[rand_num][1]])
             game_instance.moved([game_instance.jumps_available[rand_num][0],[game_instance.jumps_available[rand_num][1]]], current_instance.roomid)
         # priority five, make random move
         else:
