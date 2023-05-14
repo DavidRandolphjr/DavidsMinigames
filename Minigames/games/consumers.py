@@ -7,7 +7,7 @@ from asgiref.sync import async_to_sync
 from django.http import JsonResponse, HttpResponse, HttpResponseRedirect
 from django.urls import reverse
 from django.db.models import Q
-from .models import Room, Checkers
+from .models import Room, Checkers, Monopoly
 from .gameplay import checkers_game, Game
 
 
@@ -39,8 +39,8 @@ class MyConsumer(WebsocketConsumer):
         roomid = text_data_json['roomid']
         room = Room.objects.get(pk=roomid)
         library = {
-                    "Checkers": Checkers.objects.get(roomid=roomid), 
-                    #"Dice":dice
+                    "Checkers": Checkers.objects.filter(roomid=roomid).first(), 
+                    "Monopoly": Monopoly.objects.filter(roomid=roomid).first(), 
                     }
         try:
             # Even though start_game isnt being used, I think it makes this statement work because try: would stop if it didnt recieve "started"

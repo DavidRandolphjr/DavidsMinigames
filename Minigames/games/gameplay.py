@@ -1,6 +1,6 @@
 
 from django.http import JsonResponse, HttpResponse, HttpResponseRedirect
-from .models import Room, Checkers, Dice, Lobby
+from .models import Room, Checkers, Lobby, Monopoly
 from .models import User
 import ast
 import random
@@ -410,7 +410,11 @@ class Game:
                 checker_delete = str(checker_delete)
                 
                 checker_removal= checker_delete
-                
+                if jumped in self.kings:
+                    print("jumped",jumped, "was in self.kings", self.kings)
+                    self.kings.remove(jumped)
+                    the_game.kings = self.kings
+                    print("This is self.kings", self.kings)
                 
             except:
                 pass
@@ -418,13 +422,39 @@ class Game:
         if self.who == self.playertwo:
             
             the_game.player_one = checker_removal
+            
         else:
             
             the_game.player_two = checker_removal
+            
         
         the_game.save()
         print("__________________________________________________")
+class Game_monopoly:
+    def __init__(self, current_instance,roomid=None,):
+        self.current_instance = current_instance
+        self.playerone = ast.literal_eval(current_instance.player_one)
+        self.playertwo = ast.literal_eval(current_instance.player_two)
+        self.playerthree = ast.literal_eval(current_instance.player_three)
+        self.playerfour = ast.literal_eval(current_instance.player_four)
+        self.positions = ast.literal_eval(current_instance.positions)
+        self.who = current_instance.turn
+        self.teamowners = current_instance.team_owner.split()
+        # self.turn returns the index of who's turn it is
+        self.turn = self.teamowners.index(self.who)
+        
+    def roll_dice(self):
+        roll = random.randrange(2, 12)
+        self.positions[self.turn] += roll 
 
+        self.current_instance.positions = str(self.positions)
+        if self.turn <3:
+            self.current_instance.turn = self.teamowners[self.turn +1]
+        else:
+            self.current_instance.turn = self.teamowners[0]
+        self.current_instance.rolled_dice = True
+        self.current_instance.save()
+    pass
 # Im gonna have to include jumps
 def checkers_game(current_instance, moved=None, aiturn=None):
     player_instance = current_instance.player_one
@@ -478,12 +508,16 @@ def checkers_game(current_instance, moved=None, aiturn=None):
                     break
                 # sub-priority two, perform safe move with at risk checker if possible
                 for k in game_instance.moves_safe:
+                    print("LEARNING HERE______", i[0], k[0])
                     if i[0] == k[0]:
                         print("AI did a safe move",[k[0],[k[1]]])
                         game_instance.moved([k[0],[k[1]]], current_instance.roomid)
                         taskfulfilled = True
                         break
                     # sub-priority three, cover at risk spot with another checker
+                if taskfulfilled:
+                    break
+                for k in game_instance.moves_safe:
                     if k[1] in i[1]:
                         print("AI did a block move",[k[0],[k[1]]])
                         game_instance.moved([k[0],[k[1]]], current_instance.roomid)
@@ -538,7 +572,7 @@ def checkers_game(current_instance, moved=None, aiturn=None):
             
             rand_num =len(game_instance.jumps_available)-1
             print("REGULAR JUMP", [game_instance.jumps_available[rand_num][0],game_instance.jumps_available[rand_num][1]])
-            game_instance.moved([game_instance.jumps_available[rand_num][0],[game_instance.jumps_available[rand_num][1]]], current_instance.roomid)
+            game_instance.moved([game_instance.jumps_available[rand_num][0],game_instance.jumps_available[rand_num][1]], current_instance.roomid)
         # priority five, make random move
         else:
             
@@ -563,7 +597,15 @@ def checkers_game(current_instance, moved=None, aiturn=None):
 
         }])
 
+def monopoly_game(current_instance, moved=None, aiturn=None):
+    # Havent come up with anything yet
+    game_instance = Game_monopoly(current_instance)
+    return ([{
+        "player_turn": current_instance.turn,
+        "rolled_dice": current_instance.rolled_dice,
+        "positions": ast.literal_eval(current_instance.positions)
 
+        }])
 
 
 

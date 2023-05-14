@@ -33,8 +33,23 @@ class Checkers(models.Model):
     def __str__(self) -> str:
         return f""
     
-class Dice(models.Model):
+class Monopoly(models.Model):
     #roomid is what is going to link the Dice class to the room class
-    roomid = models.ForeignKey(Room, on_delete=models.CASCADE, related_name="diceroomid", null=True)
+    roomid = models.ForeignKey(Room, on_delete=models.CASCADE, related_name="monopolyroomid", null=True)
+    lobby = models.ManyToManyField("Lobby", related_name="people_in_lobby")
+    # We can prompt the user to choose a team. Then it will go to views.py or consumers.py and change team_owner to something like [David,AI]
+    team_owner = models.CharField(max_length=500, default="AI")
+    positions = models.CharField(max_length=500, default="[0,0,0,0]")
+    monopolies = models.CharField(max_length=500, default="[]")
+    money = models.CharField(max_length=500, default="[1500,1500,1500,1500]")
+    # player_one,two,three,four will contain the properties that are owned.
+    player_one = models.CharField(max_length=500, default="[]")
+    player_two = models.CharField(max_length=500, default="[]")
+    player_three = models.CharField(max_length=500, default="[]")
+    player_four = models.CharField(max_length=500, default="[]")
+    rolled_dice = models.BooleanField(default=False)
+    
+    started = models.BooleanField(default=False)
+    turn = models.CharField(max_length=500, default="AI")
     def __str__(self) -> str:
         return f""

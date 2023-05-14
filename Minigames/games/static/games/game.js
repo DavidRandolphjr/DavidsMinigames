@@ -154,38 +154,46 @@ function load_homepage(){
                                                 for(let count=0; count < place['open_spaces'].length; count++){
                                                     document.getElementById(place['open_spaces'][count]).style.backgroundColor ='black'     
                                                 }
+                                                for(let count=0; count < place['player_one'].length; count++){
+                                                    document.getElementById(place['player_one'][count]).style.backgroundColor ='black'     
+                                                }
+                                                for(let count=0; count < place['player_two'].length; count++){
+                                                    document.getElementById(place['player_two'][count]).style.backgroundColor ='black'     
+                                                }
                                                 for(let checker=0; checker < place["available_space"].length; checker++){
                                                     
                                                     if( place['available_space'][checker][0] == String([i,k])){
-                                                        
+                                                        // make green for 
+                                                        document.getElementById(place["available_space"][checker][0]).style.backgroundColor = "green"
                                                         document.getElementById(place["available_space"][checker][1]).style.backgroundColor = "blue"
                                                         document.getElementById(place["available_space"][checker][1]).addEventListener('click', moving)
                                                         function moving(){
-                                                            
-                                                            gameSocket.send(JSON.stringify({
-                                                                "name": document.getElementById("name").innerHTML,
-                                                                "roomid": document.getElementById("room").innerHTML,
-                                                                "moved": [place["available_space"][checker][0], [place["available_space"][checker][1]]]
-                                                            }))
+                                                            if(document.getElementById(place["available_space"][checker][0]).style.backgroundColor == "green"){
+                                                                gameSocket.send(JSON.stringify({
+                                                                    "name": document.getElementById("name").innerHTML,
+                                                                    "roomid": document.getElementById("room").innerHTML,
+                                                                    "moved": [place["available_space"][checker][0], [place["available_space"][checker][1]]]
+                                                                }))
+                                                            }
                                                             loads +=1
                                                             document.getElementById(place["available_space"][checker][1]).removeEventListener('click', moving)
                                                         }
                                                         
                                                     }
                                                     if( place['available_space'][checker][0] == String([i,l])){
-                                                        
+                                                        document.getElementById(place["available_space"][checker][0]).style.backgroundColor = "green"
                                                         document.getElementById(place["available_space"][checker][1]).style.backgroundColor = "blue"
                                                         document.getElementById(place["available_space"][checker][1]).addEventListener('click', moving)
                                                         function moving(){
-                                                            
-                                                            
-                                                            gameSocket.send(JSON.stringify({
-                                                                "name": document.getElementById("name").innerHTML,
-                                                                "roomid": document.getElementById("room").innerHTML,
-                                                                "moved": [place["available_space"][checker][0], [place["available_space"][checker][1]]]
-                                                            }))
-                                                            document.getElementById(place["available_space"][checker][1]).removeEventListener('click', moving)
+                                                            if(document.getElementById(place["available_space"][checker][0]).style.backgroundColor == "green"){
+                                                                gameSocket.send(JSON.stringify({
+                                                                    "name": document.getElementById("name").innerHTML,
+                                                                    "roomid": document.getElementById("room").innerHTML,
+                                                                    "moved": [place["available_space"][checker][0], [place["available_space"][checker][1]]]
+                                                                }))
+                                                            }
                                                             loads +=1
+                                                            document.getElementById(place["available_space"][checker][1]).removeEventListener('click', moving)
                                                         }
                                                         
 
@@ -208,20 +216,23 @@ function load_homepage(){
                                                     if( place['jumps'][checker][0] == String([i,k])){
                                                         console.log("checking stuff", place['jumps'][checker][0] , [i,k])
                                                         for(let jump_checker=0; jump_checker < place["jumps"][checker][1].length; jump_checker++){
+                                                            document.getElementById(place["jumps"][checker][0]).style.backgroundColor = "green"
                                                             document.getElementById(place["jumps"][checker][1][jump_checker]).style.backgroundColor = "blue"
                                                             document.getElementById(place["jumps"][checker][1][jump_checker]).addEventListener('click', jumping)
                                                             function jumping(){
                                                                 // we have do delete the last value of place["jumps"][checker][1] and replace it with place["jumps"][checker][1][jump_checker]
                                                                 // to do this i am thinking of creating a const variable 
-                                                                const checkers_jumped = place["jumps"][checker][1]
-                                                                checkers_jumped.push(place["jumps"][checker][1][jump_checker])
-                                                                gameSocket.send(JSON.stringify({
-                                                                    "name": document.getElementById("name").innerHTML,
-                                                                    "roomid": document.getElementById("room").innerHTML,
-                                                                    "moved": [place["jumps"][checker][0], place["jumps"][checker][1]]
-                                                                }))
-                                                                loads+=1
-                                                                document.getElementById(place["jumps"][checker][1][jump_checker]).removeEventListener('click', jumping)
+                                                                if(document.getElementById(place["jumps"][checker][0]).style.backgroundColor == "green"){
+                                                                    const checkers_jumped = place["jumps"][checker][1]
+                                                                    checkers_jumped.push(place["jumps"][checker][1][jump_checker])
+                                                                    gameSocket.send(JSON.stringify({
+                                                                        "name": document.getElementById("name").innerHTML,
+                                                                        "roomid": document.getElementById("room").innerHTML,
+                                                                        "moved": [place["jumps"][checker][0], place["jumps"][checker][1]]
+                                                                    }))
+                                                                    loads+=1
+                                                                    document.getElementById(place["jumps"][checker][1][jump_checker]).removeEventListener('click', jumping)
+                                                                }   
                                                             }
                                                         }
                                                         
@@ -229,18 +240,22 @@ function load_homepage(){
                                                     if( place['jumps'][checker][0] == String([i,l])){
                                                         console.log("this is jumps available",place['jumps'][checker])
                                                         for(let jump_checker=0; jump_checker < place["jumps"][checker][1].length; jump_checker++){
+                                                            document.getElementById(place["jumps"][checker][0]).style.backgroundColor = "green"
                                                             document.getElementById(place["jumps"][checker][1][jump_checker]).style.backgroundColor = "blue"
                                                             document.getElementById(place["jumps"][checker][1][jump_checker]).addEventListener('click', jumping)
                                                             function jumping(){
                                                                 
-                                                                gameSocket.send(JSON.stringify({
-                                                                    "name": document.getElementById("name").innerHTML,
-                                                                    "roomid": document.getElementById("room").innerHTML,
-                                                                    "moved": [place["jumps"][checker][0], place["jumps"][checker][1]]
-                                                                }))
-                                                                loads+=1
-                                                                document.getElementById(place["jumps"][checker][1][jump_checker]).removeEventListener('click', jumping)
-                                                                
+                                                                if(document.getElementById(place["jumps"][checker][0]).style.backgroundColor == "green"){
+                                                                    const checkers_jumped = place["jumps"][checker][1]
+                                                                    checkers_jumped.push(place["jumps"][checker][1][jump_checker])
+                                                                    gameSocket.send(JSON.stringify({
+                                                                        "name": document.getElementById("name").innerHTML,
+                                                                        "roomid": document.getElementById("room").innerHTML,
+                                                                        "moved": [place["jumps"][checker][0], place["jumps"][checker][1]]
+                                                                    }))
+                                                                    loads+=1
+                                                                    document.getElementById(place["jumps"][checker][1][jump_checker]).removeEventListener('click', jumping)
+                                                                } 
                                                             }
                                                         }
                                                         
