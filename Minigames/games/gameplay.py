@@ -438,24 +438,117 @@ class Game_monopoly:
         self.playerthree = ast.literal_eval(current_instance.player_three)
         self.playerfour = ast.literal_eval(current_instance.player_four)
         self.positions = ast.literal_eval(current_instance.positions)
+        self.available_prop= ast.literal_eval(current_instance.available_prop)
+        self.money = ast.literal_eval(current_instance.money)
         self.who = current_instance.turn
         self.teamowners = current_instance.team_owner.split()
         # self.turn returns the index of who's turn it is
-        self.turn = self.teamowners.index(self.who)
+        self.turn = current_instance.turn_index
+        self.themove= ""
+        self.property_cost = {
+            "1": ["MEDITERRANEAN AVENUE",60],
+            "3": ["BALTIC AVENUE",60],
+            "5": ["READING RAILROAD",200],
+            "6": ["ORIENTAL AVENUE",100],
+            "8": ["VERMONT AVENUE",100],
+            "9": ["CONNECTICUT AVENUE",120],
+            "11": ["ST.CHARLES PLACE",140],
+            "12": ["ELECTRIC COMPANY",150],
+            "13": ["STATES AVENUE",140],
+            "14": ["VIRGINIA AVENUE", 160],
+            "15": [200],
+            "16": [180],
+            "18": [180],
+            "19": [200],
+            "21": [220],
+            "23": [220],
+            "24": [240],
+            "25": [200],
+            "26": [260],
+            "27": [260],
+            "28": [150],
+            "29": [280],
+            "31": [300],
+            "32": [300],
+            "34": [320], 
+            "35": [200],
+            "37": [350],
+            "39": [400],
+
+
+        }
         
     def roll_dice(self):
+        print("most importantly, made it here")
         roll = random.randrange(2, 12)
         self.positions[self.turn] += roll 
 
         self.current_instance.positions = str(self.positions)
+        
+        self.current_instance.rolled_dice = True
+        self.current_instance.themove = "rolled a %s" % roll
+        self.current_instance.save()
+        
+        
+        return(self.themove)
+    
+    def end_turn(self):
+        # might have to move this piece to an "end move" function
         if self.turn <3:
             self.current_instance.turn = self.teamowners[self.turn +1]
+            self.current_instance.turn_index +=1
         else:
             self.current_instance.turn = self.teamowners[0]
-        self.current_instance.rolled_dice = True
+            self.current_instance.turn_index =0
+        self.current_instance.themove = "ended turn"
         self.current_instance.save()
-    pass
-# Im gonna have to include jumps
+        return()
+        
+    def purch_available(self):
+        # self.positions[self.current_instance.turn_index] is the spot the current player is on
+        print("whats this", self.positions[self.turn])
+        try:
+            if self.positions[self.current_instance.turn_index] in self.available_prop and self.money[self.turn]> self.property_cost[str(self.positions[self.turn])]:
+                return("Purchase available")
+            else:
+                return("Not available for purchase / insufficient funds")
+        except:
+            return("Not available for purchase / insufficient funds")
+    
+    def purchased(self):
+        print("got into purchased")
+        player_list = [self.playerone, self.playertwo, self.playerthree, self.playerfour]
+        # we save the added property to self.playerwhatever first because it is an actual list
+        
+        player_list[self.turn].append(self.positions[self.current_instance.turn_index])
+        # then we convert it to a string and save it to the actual model table
+        print("this is what is owned", player_list[self.turn])
+        if self.turn ==0:
+            self.current_instance.player_one = str(player_list[self.turn])
+        elif self.turn ==1:
+            self.current_instance.player_two = str(player_list[self.turn])
+        elif self.turn ==2:
+            self.current_instance.player_three = str(player_list[self.turn])
+        else:
+            self.current_instance.player_four = str(player_list[self.turn])
+        
+        # remove property from available property list
+        
+        self.available_prop.remove(self.positions[self.turn])
+        # covert property list to string and save to actual model table
+        
+        self.current_instance.available_prop = str(self.available_prop)
+        # self.themove is equal to a placeholder. We ultimately want it to way what was purchased, not a number
+
+        self.money[self.turn] -=self.property_cost[str(self.positions[self.turn])]
+
+        self.current_instance.money = str(self.money)
+        
+        self.current_instance.themove = "purchased %s" % self.positions[self.turn]
+        
+        self.current_instance.save()
+        return()
+
 def checkers_game(current_instance, moved=None, aiturn=None):
     player_instance = current_instance.player_one
     
@@ -599,11 +692,26 @@ def checkers_game(current_instance, moved=None, aiturn=None):
 
 def monopoly_game(current_instance, moved=None, aiturn=None):
     # Havent come up with anything yet
+    
     game_instance = Game_monopoly(current_instance)
+    if moved:
+        
+        move_options = {
+            "roll": game_instance.roll_dice,
+            "endturn": game_instance.end_turn,
+            "purchased": game_instance.purchased,
+
+        }
+        move_options[moved]()
+        print("this is themove", game_instance.themove)
     return ([{
         "player_turn": current_instance.turn,
         "rolled_dice": current_instance.rolled_dice,
-        "positions": ast.literal_eval(current_instance.positions)
+        "positions": ast.literal_eval(current_instance.positions),
+        "money": ast.literal_eval(current_instance.money),
+        "themove": current_instance.themove,
+        "turn_index": current_instance.turn_index,
+        "purch_available": str(game_instance.purch_available()),
 
         }])
 
