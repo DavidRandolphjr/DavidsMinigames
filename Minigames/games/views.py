@@ -8,8 +8,8 @@ from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
 import os
-from .models import Room, Checkers, Dice, Lobby
-from .gameplay import checkers_game, Game
+from .models import Room, Checkers, Monopoly, Lobby
+from .gameplay import checkers_game, monopoly_game
 
 from .models import User
 
@@ -22,11 +22,11 @@ def index(request):
     
     games = [
         "Checkers",
-        "Uno"
+        "Monopoly"
         ]
     images = [
         "/games/files/userimages/Checkerboard-draughtboard-play.webp", #Checkers
-        "jim", #Uno
+        "/games/files/userimages/monopboard.jpg", #Monopoly
         ]
     length=range(len(games))
     #The purpose of games_id and games_string is to pass them to the url for each game in order to create a new instance..
@@ -42,7 +42,11 @@ def game(request, gamename=None ,id=None, name=None):
         try:
             # i can create another library dictionary that changes the html that the user gets redirected to
             room = Room.objects.get(id=id, name=name)
-            return render(request, "games/game.html", {"room": room.id, "name": request.user, "gamename": gamename})
+            html_library={
+                "Checkers": "games/game.html",
+                "Monopoly": "games/monopoly.html"
+            }
+            return render(request, html_library[room.gamename], {"room": room.id, "name": request.user, "gamename": gamename})
         except Room.DoesNotExist:
 
             #messages.error(request, "Room does not exist. You fool!!")
@@ -54,9 +58,7 @@ def game(request, gamename=None ,id=None, name=None):
         room.save()
         #game library
 
-        dice = Dice(
-            roomid= Room.objects.get(pk = room.id)
-        )
+        
         lobby = Lobby(
             roomid= Room.objects.get(pk = room.id),
             players = request.user
@@ -66,7 +68,10 @@ def game(request, gamename=None ,id=None, name=None):
             roomid= Room.objects.get(pk = room.id),
             team_owner= "AI %s" % (request.user)
             ), 
-            "Dice":dice
+            "Monopoly": Monopoly(
+            roomid= Room.objects.get(pk = room.id),
+            team_owner= "AI %s" % (request.user)
+            ),
             }
 
         #create class instance based on gamename
@@ -80,7 +85,8 @@ def started(request, id):
     room = Room.objects.get(pk=id)
     #dice = Dice.objects.get(roomid=room)
     library = {
-            "Checkers": Checkers.objects.get(roomid=id), 
+            "Checkers": Checkers.objects.filter(roomid=id).first(), 
+            "Monopoly": Monopoly.objects.filter(roomid=id).first(), 
             #"Dice":dice
             }
     #library[room.gamename].started = True
@@ -92,18 +98,21 @@ def board(request, id):
     room = Room.objects.get(pk=id)
     #dice = Dice.objects.get(roomid=room)
     library = {
-            "Checkers": Checkers.objects.get(roomid=id), 
+            "Checkers": Checkers.objects.filter(roomid=id).first(), 
+            "Monopoly": Monopoly.objects.filter(roomid=id).first(), 
             #"Dice":dice
             }
     game_instance = library[room.gamename]
+    print("this is the gamename", room.gamename)
+    # I am thinking that we make a list of games. Then, we will just d
     game_board = {
-            "Checkers": checkers_game(game_instance), 
-            #"Dice":dice
+            "Checkers": checkers_game, 
+            "Monopoly": monopoly_game,
             }
     
 
     # I think we should then pass game_instance to the proper function in gameplay.py
-    return JsonResponse(game_board[room.gamename], safe=False)
+    return JsonResponse(game_board[room.gamename](game_instance), safe=False)
 
     
 def notfound(request):

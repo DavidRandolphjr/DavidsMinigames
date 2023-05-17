@@ -1,0 +1,577 @@
+{% extends "games/layout.html" %}CONNECE
+{% load static %}
+{% load mytags %}
+
+{% block body %}
+<p id="name" hidden>{{name}}</p>
+<p id="room" hidden>{{room}}</p>
+
+<div id="myModal" class="moda">
+
+    <!-- Modal content -->
+    <div class="modal-content">
+        
+        <div class="row">
+            <div class="col-6 col-sm-6">
+                
+                <label for="team_one">Player 1:</label>
+                <select name="team_one" id="team_one" style="width: 50%">
+                </select>
+                <br>
+                <label for="team_two">Player 2:</label>
+                <select name="team_two" id="team_two" style="width: 50%">
+                </select>
+                <br>
+                <label for="team_three">Player 3:</label>
+                <select name="team_three" id="team_three" style="width: 50%">
+                </select>  
+                <br>
+                <label for="team_four">Player 4:</label>
+                <select name="team_four" id="team_four" style="width: 50%">
+                </select>     
+            </div>
+            <div class="col-6 col-sm-6">
+                <h1>Lobby:</h1>  
+                <div style="height:100px;width:100%;overflow:auto;scrollbar-base-color:gold;font-family:sans-serif;padding:10px;" id="lobby_players">
+                </div>
+            </div>
+            
+        </div>
+        <button type="button" class="btn btn-primary" id="startgame">Start</button>
+        
+    </div>
+  
+</div>
+
+    <div class="game-container">
+        
+       <div class="monopoly-game">
+            
+          <div class="monopoly-central-components">
+            <div class="float-container">
+
+                <div class="float-child">
+                    <button class="monopoly-game-choices-item" id="roll-dice">Roll the dice</button>
+                    <button class="monopoly-game-choices-item" id="trade-with-player1">Trade with Player 2</button>
+                    <button class="monopoly-game-choices-item" id="trade-with-player2">Trade with Player 3</button>
+                    <button class="monopoly-game-choices-item" id="end-turn">End Turn</button>
+                    
+                </div>
+                
+                <div class="float-child">
+                <div class="blue">Float Column 2</div>
+                </div>
+                
+            </div> 
+             <div class="game-log-console" id="gamelog">
+                <p class="game-log-message" style="opacity: 1;"><span style="color: darkblue; font-weight: bold;">Player 3</span> bought Reading Railroad</p>
+                <p class="game-log-message" style="opacity: 1;"><span style="color: darkblue; font-weight: bold;">Player 3</span> rolled a 4 and a 1</p>
+                <p class="game-log-message" style="opacity: 1;"><span style="color: lawngreen; font-weight: bold;">Player 2</span> bought Baltic Avenue</p>
+                <p class="game-log-message" style="opacity: 1;"><span style="color: lawngreen; font-weight: bold;">Player 2</span> rolled a 2 and a 1</p>
+                <p class="game-log-message" style="opacity: 1;"><span style="color: red; font-weight: bold;">Player 1</span> rolled a 6 and a 1</p>
+             </div>
+          </div>
+          <svg class="monopoly-board" width="902" height="902">
+             <g class="monopoly-row" transform="translate(0, 802)">
+                <g class="monopoly-square" transform="translate(802)" id="0">
+                   <rect fill="white" stroke="black" width="100" height="100"></rect>
+                   <g transform="translate(4, 58) rotate(-45)">
+                      <text x="0" y="0" font-size="8">
+                         <tspan x="10.609375" dy="0em">COLLECT $200</tspan>
+                         <tspan x="7.421875" dy="1.4em">SALARY AS YOU</tspan>
+                         <tspan x="28.625" dy="1.4em">PASS</tspan>
+                      </text>
+                      
+                      <g transform="translate(20, 30)">
+                         <path fill-rule="evenodd" stroke="black" stroke-width="1" fill="red" d="M 0 0 L 0 20 L 16 20 L 16 8 L 6 8 L 6 12 L 12 12 L 12 16 L 4 16 L 4 4 L 16 4 L 16 0 Z M 20 0 L 20 20 L 36 20 L 36 0 L 20 0 M 24 4 L 24 16 L 32 16 L 32 4 Z"></path>
+                      </g>
+                   </g>
+                   <g transform="scale(0.6) translate(6, 134)">
+                      <path stroke="black" stroke-width="1" fill="red" d="M 0 10 L 20 0 L 20 7 L 120 7 L 124 2 L 140 2 L 136 10 L 140 18 L 124 18 L 120 13 L 20 13 L 20 20 Z"></path>
+                   </g>
+                   
+                </g>
+                <g class="monopoly-square" transform="translate(724)" id="1">
+                   <rect fill="white" stroke="black" width="78" height="100"></rect>
+                   <rect width="78" height="20" fill="midnightblue" stroke="black"></rect>
+                   <text x="0" y="35" font-size="8">
+                      <tspan x="4.328125" dy="0em">MEDITERRANEAN</tspan>
+                      <tspan x="22.84375" dy="1.4em">AVENUE</tspan>
+                   </text>
+                   <text x="0" y="65" font-size="10">
+                        <tspan x="13.984375" dy="0em">Butt Pickle</tspan>
+                    </text>
+                   <text x="0" y="92" font-size="10">
+                      <tspan x="13.984375" dy="0em">PRICE $60</tspan>
+                   </text>
+                   <svg width="45" height="45" y="0" style="border:1px solid">
+                    <defs>
+                       <clipPath id="myCircle">
+                        <rect  stroke="black" width="78" height="100"></rect>
+                       </clipPath>
+                    </defs>
+                    <image width="45" height="45" xlink:href="\games\files\userimages\monopoly-game-piece-car (1).jpg" clip-path="url(#myCircle)" />
+                    </svg>
+                </g>
+                <g class="monopoly-square" transform="translate(646)" id="2">
+                   <rect fill="white" stroke="black" width="78" height="100"></rect>
+                   <text x="0" y="14" font-size="8">
+                      <tspan x="14.333333969116211" dy="0em">COMMUNITY</tspan>
+                      <tspan x="25.442708015441895" dy="1.4em">CHEST</tspan>
+                   </text>
+                </g>
+                <g class="monopoly-square" transform="translate(568)" id="3">
+                   <rect fill="white" stroke="black" width="78" height="100"></rect>
+                   <rect width="78" height="20" fill="midnightblue" stroke="black"></rect>
+                   <text x="0" y="35" font-size="8">
+                      <tspan x="8.25" dy="0em">BALTIC AVENUE</tspan>
+                   </text>
+                   <text x="0" y="92" font-size="10">
+                      <tspan x="13.984375" dy="0em">PRICE $60</tspan>
+                   </text>
+                   <!--This is how we know who owns what-->
+                   <rect y="97" width="78" height="3" stroke="black" class="owner-band" style="" fill="lawngreen"></rect>
+                   
+                </g>
+                <g class="monopoly-square" transform="translate(490)" id="4">
+                   <rect fill="white" stroke="black" width="78" height="100"></rect>
+                   <text x="0" y="14" font-size="8">
+                      <tspan x="14.473958969116211" dy="0em">INCOME TAX</tspan>
+                   </text>
+                   <text x="0" y="70" font-size="10">
+                      <tspan x="9.541666030883789" dy="0em">PAY 10% OR</tspan>
+                      <tspan x="27.875" dy="1.4em">$200</tspan>
+                   </text>
+                </g>
+                <g class="monopoly-square" transform="translate(412)" id="5">
+                   <rect fill="white" stroke="black" width="78" height="100"></rect>
+                   <g transform="scale(0.2) translate(50, 140)">
+                      <path fill="#231f20" d=" M 53.25 32.29 C 67.32 32.29 81.38 31.88 95.44 31.75 C 98.36 36.41 01.25 41.09 104.10 45.79 C 97.92 65.46 91.66 85.11 85.40 104.76 C 112.26 104.74 139.12 104.76 165.98 104.75 C 175.59 105.16 185.21 105.00 194.83 104.95 C 195.30 103.72 195.11 102.66 194.25 101.75 C 187.88 94.04 182.81 84.83 181.69 74.75 C 180.70 67.33 182.07 59.50 186.08 53.11 C 189.44 47.44 195.60 43.66 202.07 42.77 C 223.29 42.73 244.52 42.76 265.75 42.76 C 265.64 47.26 265.90 51.75 266.04 56.24 C 257.26 68.06 247.71 79.67 242.29 93.52 C 235.94 107.42 233.68 123.53 237.79 138.39 C 240.30 147.47 246.53 154.83 252.74 161.66 C 252.75 164.02 252.75 166.38 252.75 168.75 C 246.50 168.77 240.23 168.57 234.01 169.33 C 232.38 169.35 233.30 171.20 233.99 171.84 C 239.63 179.37 240.63 189.78 237.53 198.54 C 235.22 205.20 230.08 210.74 223.75 213.79 C 215.17 218.40 204.32 217.83 195.89 213.18 C 189.05 209.12 184.00 202.15 182.25 194.40 C 180.57 185.77 182.48 176.39 188.13 169.54 C 167.12 169.93 146.10 169.61 125.09 169.83 C 129.60 174.39 133.32 180.03 134.26 186.49 C 136.20 197.28 131.00 208.94 121.54 214.54 C 114.51 218.47 105.82 219.38 98.17 216.78 C 89.87 213.94 82.88 206.96 80.88 198.31 C 78.11 188.23 81.30 176.85 89.28 170.01 C 85.83 169.99 82.37 170.00 78.92 169.99 C 73.14 185.67 68.43 201.72 62.95 217.51 C 47.59 217.43 32.23 217.63 16.87 217.40 C 29.42 201.68 42.34 186.26 54.82 170.50 C 52.06 169.59 48.72 170.83 46.43 168.70 C 35.32 160.78 29.45 146.29 32.14 132.88 C 32.29 126.89 35.46 121.66 38.43 116.66 C 41.50 112.73 45.25 109.37 48.91 106.00 C 53.89 106.00 58.88 106.00 63.86 105.99 C 57.22 85.55 50.82 65.02 44.16 44.58 C 47.19 40.49 50.17 36.35 53.25 32.29 Z"></path>
+                   </g>
+                   <text x="0" y="14" font-size="8">
+                      <tspan x="20.77083396911621" dy="0em">READING</tspan>
+                      <tspan x="18.546875" dy="1.4em">RAILROAD</tspan>
+                   </text>
+                   <text x="0" y="92" font-size="10">
+                      <tspan x="11.203125" dy="0em">PRICE $200</tspan>
+                   </text>
+                   <rect y="97" width="78" height="3" stroke="black" class="owner-band" style="" fill="darkblue"></rect>
+                   
+                </g>
+                <g class="monopoly-square" transform="translate(334)" id="6">
+                   <rect fill="white" stroke="black" width="78" height="100"></rect>
+                   <rect width="78" height="20" fill="lightskyblue" stroke="black"></rect>
+                   <text x="0" y="35" font-size="8">
+                      <tspan x="19.29166603088379" dy="0em">ORIENTAL</tspan>
+                      <tspan x="22.84375" dy="1.4em">AVENUE</tspan>
+                   </text>
+                   <text x="0" y="92" font-size="10">
+                      <tspan x="11.203125" dy="0em">PRICE $100</tspan>
+                   </text>
+                   <rect y="97" width="78" height="3" stroke="black" class="owner-band" style="display: none;"></rect>
+                </g>
+                <g class="monopoly-square" transform="translate(256)" id="7">
+                   <rect fill="white" stroke="black" width="78" height="100"></rect>
+                   <text x="0" y="14" font-size="8">
+                      <tspan x="22.109375" dy="0em">CHANCE</tspan>
+                   </text>
+                   
+                </g>
+                <g class="monopoly-square" transform="translate(178)" id="8">
+                   <rect fill="white" stroke="black" width="78" height="100"></rect>
+                   <rect width="78" height="20" fill="lightskyblue" stroke="black"></rect>
+                   <text x="0" y="35" font-size="8">
+                      <tspan x="19" dy="0em">VERMONT</tspan>
+                      <tspan x="22.84375" dy="1.4em">AVENUE</tspan>
+                   </text>
+                   <text x="0" y="92" font-size="10">
+                      <tspan x="11.203125" dy="0em">PRICE $100</tspan>
+                   </text>
+                   <rect y="97" width="78" height="3" stroke="black" class="owner-band" style="display: none;"></rect>
+                </g>
+                <g class="monopoly-square" transform="translate(100)" id="9">
+                   <rect fill="white" stroke="black" width="78" height="100"></rect>
+                   <rect width="78" height="20" fill="lightskyblue" stroke="black"></rect>
+                   <text x="0" y="35" font-size="8">
+                      <tspan x="9.890625" dy="0em">CONNECTICUT</tspan>
+                      <tspan x="22.84375" dy="1.4em">AVENUE</tspan>
+                   </text>
+                   <text x="0" y="92" font-size="10">
+                      <tspan x="11.203125" dy="0em">PRICE $120</tspan>
+                   </text>
+                   <rect y="97" width="78" height="3" stroke="black" class="owner-band" style="display: none;"></rect>
+                </g>
+             </g>
+             <g class="monopoly-row" transform="translate(100) rotate(90)">
+                <g class="monopoly-square" transform="translate(802)" id="10">
+                   <rect fill="white" stroke="black" width="100" height="100"></rect>
+                   <rect width="75" height="75" fill="orangered" stroke="black"></rect>
+                   <rect width="37.5" height="37.5" fill="white" stroke="black" transform="translate(27.272727272727273) rotate(45)"></rect>
+                   <text x="0" y="92" font-size="12">
+                      <tspan x="24" dy="0em">JUST</tspan>
+                   </text>
+                   <g transform="translate(92 75) rotate(-90)">
+                      <text x="0" y="0" font-size="12">
+                         <tspan x="13.328125" dy="0em">VISITING</tspan>
+                      </text>
+                   </g>
+                </g>
+                <g class="monopoly-square" transform="translate(724)" id="11">
+                   <rect fill="white" stroke="black" width="78" height="100"></rect>
+                   <rect width="78" height="20" fill="mediumvioletred" stroke="black"></rect>
+                   <text x="0" y="35" font-size="8">
+                      <tspan x="14.322916030883789" dy="0em">ST.CHARLES</tspan>
+                      <tspan x="25.880208015441895" dy="1.4em">PLACE</tspan>
+                   </text>
+                   <text x="0" y="92" font-size="10">
+                      <tspan x="11.203125" dy="0em">PRICE $140</tspan>
+                   </text>
+                   <rect y="97" width="78" height="3" stroke="black" class="owner-band" style="display: none;"></rect>
+                </g>
+                <g class="monopoly-square" transform="translate(646)" id="12">
+                   <rect fill="white" stroke="black" width="78" height="100"></rect>
+                   <text x="0" y="14" font-size="8">
+                      <tspan x="19.21875" dy="0em">ELECTRIC</tspan>
+                      <tspan x="19.06770896911621" dy="1.4em">COMPANY</tspan>
+                   </text>
+                   <text x="0" y="92" font-size="10">
+                      <tspan x="11.203125" dy="0em">PRICE $150</tspan>
+                   </text>
+                   <rect y="97" width="78" height="3" stroke="black" class="owner-band" style="display: none;"></rect>
+                </g>
+                <g class="monopoly-square" transform="translate(568)" id="13">
+                   <rect fill="white" stroke="black" width="78" height="100"></rect>
+                   <rect width="78" height="20" fill="mediumvioletred" stroke="black"></rect>
+                   <text x="0" y="35" font-size="8">
+                      <tspan x="6.989582061767578" dy="0em">STATES AVENUE</tspan>
+                   </text>
+                   <text x="0" y="92" font-size="10">
+                      <tspan x="11.203125" dy="0em">PRICE $140</tspan>
+                   </text>
+                   <rect y="97" width="78" height="3" stroke="black" class="owner-band" style="display: none;"></rect>
+                </g>
+                <g class="monopoly-square" transform="translate(490)" id="14">
+                   <rect fill="white" stroke="black" width="78" height="100"></rect>
+                   <rect width="78" height="20" fill="mediumvioletred" stroke="black"></rect>
+                   <text x="0" y="35" font-size="8">
+                      <tspan x="4.614582061767578" dy="0em">VIRGINIA AVENUE</tspan>
+                   </text>
+                   <text x="0" y="92" font-size="10">
+                      <tspan x="11.203125" dy="0em">PRICE $160</tspan>
+                   </text>
+                   <rect y="97" width="78" height="3" stroke="black" class="owner-band" style="display: none;"></rect>
+                </g>
+                <g class="monopoly-square" transform="translate(412)" id="15">
+                   <rect fill="white" stroke="black" width="78" height="100"></rect>
+                   <g transform="scale(0.2) translate(50, 140)">
+                      <path fill="#231f20" d=" M 53.25 32.29 C 67.32 32.29 81.38 31.88 95.44 31.75 C 98.36 36.41 01.25 41.09 104.10 45.79 C 97.92 65.46 91.66 85.11 85.40 104.76 C 112.26 104.74 139.12 104.76 165.98 104.75 C 175.59 105.16 185.21 105.00 194.83 104.95 C 195.30 103.72 195.11 102.66 194.25 101.75 C 187.88 94.04 182.81 84.83 181.69 74.75 C 180.70 67.33 182.07 59.50 186.08 53.11 C 189.44 47.44 195.60 43.66 202.07 42.77 C 223.29 42.73 244.52 42.76 265.75 42.76 C 265.64 47.26 265.90 51.75 266.04 56.24 C 257.26 68.06 247.71 79.67 242.29 93.52 C 235.94 107.42 233.68 123.53 237.79 138.39 C 240.30 147.47 246.53 154.83 252.74 161.66 C 252.75 164.02 252.75 166.38 252.75 168.75 C 246.50 168.77 240.23 168.57 234.01 169.33 C 232.38 169.35 233.30 171.20 233.99 171.84 C 239.63 179.37 240.63 189.78 237.53 198.54 C 235.22 205.20 230.08 210.74 223.75 213.79 C 215.17 218.40 204.32 217.83 195.89 213.18 C 189.05 209.12 184.00 202.15 182.25 194.40 C 180.57 185.77 182.48 176.39 188.13 169.54 C 167.12 169.93 146.10 169.61 125.09 169.83 C 129.60 174.39 133.32 180.03 134.26 186.49 C 136.20 197.28 131.00 208.94 121.54 214.54 C 114.51 218.47 105.82 219.38 98.17 216.78 C 89.87 213.94 82.88 206.96 80.88 198.31 C 78.11 188.23 81.30 176.85 89.28 170.01 C 85.83 169.99 82.37 170.00 78.92 169.99 C 73.14 185.67 68.43 201.72 62.95 217.51 C 47.59 217.43 32.23 217.63 16.87 217.40 C 29.42 201.68 42.34 186.26 54.82 170.50 C 52.06 169.59 48.72 170.83 46.43 168.70 C 35.32 160.78 29.45 146.29 32.14 132.88 C 32.29 126.89 35.46 121.66 38.43 116.66 C 41.50 112.73 45.25 109.37 48.91 106.00 C 53.89 106.00 58.88 106.00 63.86 105.99 C 57.22 85.55 50.82 65.02 44.16 44.58 C 47.19 40.49 50.17 36.35 53.25 32.29 Z"></path>
+                   </g>
+                   <text x="0" y="14" font-size="8">
+                      <tspan x="8.911458969116211" dy="0em">PENNSYLVANIA</tspan>
+                      <tspan x="18.546875" dy="1.4em">RAILROAD</tspan>
+                   </text>
+                   <text x="0" y="92" font-size="10">
+                      <tspan x="11.203125" dy="0em">PRICE $200</tspan>
+                   </text>
+                   <rect y="97" width="78" height="3" stroke="black" class="owner-band" style="display: none;"></rect>
+                </g>
+                <g class="monopoly-square" transform="translate(334)" id="16">
+                   <rect fill="white" stroke="black" width="78" height="100"></rect>
+                   <rect width="78" height="20" fill="orange" stroke="black"></rect>
+                   <text x="0" y="35" font-size="8">
+                      <tspan x="5.65625" dy="0em">ST.JAMES PLACE</tspan>
+                   </text>
+                   <text x="0" y="92" font-size="10">
+                      <tspan x="11.203125" dy="0em">PRICE $180</tspan>
+                   </text>
+                   <rect y="97" width="78" height="3" stroke="black" class="owner-band" style="display: none;"></rect>
+                </g>
+                <g class="monopoly-square" transform="translate(256)" id="17">
+                   <rect fill="white" stroke="black" width="78" height="100"></rect>
+                   <text x="0" y="14" font-size="8">
+                      <tspan x="14.333333969116211" dy="0em">COMMUNITY</tspan>
+                      <tspan x="25.442708015441895" dy="1.4em">CHEST</tspan>
+                   </text>
+                </g>
+                <g class="monopoly-square" transform="translate(178)" id="18">
+                   <rect fill="white" stroke="black" width="78" height="100"></rect>
+                   <rect width="78" height="20" fill="orange" stroke="black"></rect>
+                   <text x="0" y="35" font-size="8">
+                      <tspan x="14.770833969116211" dy="0em">TENNESSEE</tspan>
+                      <tspan x="22.84375" dy="1.4em">AVENUE</tspan>
+                   </text>
+                   <text x="0" y="92" font-size="10">
+                      <tspan x="11.203125" dy="0em">PRICE $180</tspan>
+                   </text>
+                   <rect y="97" width="78" height="3" stroke="black" class="owner-band" style="display: none;"></rect>
+                </g>
+                <g class="monopoly-square" transform="translate(100)" id="19">
+                   <rect fill="white" stroke="black" width="78" height="100"></rect>
+                   <rect width="78" height="20" fill="orange" stroke="black"></rect>
+                   <text x="0" y="35" font-size="8">
+                      <tspan x="17.29166603088379" dy="0em">NEW YORK</tspan>
+                      <tspan x="22.84375" dy="1.4em">AVENUE</tspan>
+                   </text>
+                   <text x="0" y="92" font-size="10">
+                      <tspan x="11.203125" dy="0em">PRICE $200</tspan>
+                   </text>
+                   <rect y="97" width="78" height="3" stroke="black" class="owner-band" style="display: none;"></rect>
+                </g>
+             </g>
+             <g class="monopoly-row" transform="translate(902, 100) rotate(180)">
+                <g class="monopoly-square" transform="translate(802)" id="20">
+                   <rect fill="white" stroke="black" width="100" height="100"></rect>
+                   <g transform="translate(-8, 100) rotate(-45)">
+                      <text x="0" y="0" font-size="12">
+                         <tspan x="33.765625" dy="0em">FREE PARKING</tspan>
+                      </text>
+                   </g>
+                </g>
+                <g class="monopoly-square" transform="translate(724)" id="21">
+                   <rect fill="white" stroke="black" width="78" height="100"></rect>
+                   <rect width="78" height="20" fill="red" stroke="black"></rect>
+                   <text x="0" y="35" font-size="8">
+                      <tspan x="17.21875" dy="0em">KENTUCKY</tspan>
+                      <tspan x="22.84375" dy="1.4em">AVENUE</tspan>
+                   </text>
+                   <text x="0" y="92" font-size="10">
+                      <tspan x="11.203125" dy="0em">PRICE $220</tspan>
+                   </text>
+                   <rect y="97" width="78" height="3" stroke="black" class="owner-band" style="display: none;"></rect>
+                </g>
+                <g class="monopoly-square" transform="translate(646)" id="22">
+                   <rect fill="white" stroke="black" width="78" height="100"></rect>
+                   <text x="0" y="14" font-size="8">
+                      <tspan x="22.109375" dy="0em">CHANCE</tspan>
+                   </text>
+                </g>
+                <g class="monopoly-square" transform="translate(568)" id="23">
+                   <rect fill="white" stroke="black" width="78" height="100"></rect>
+                   <rect width="78" height="20" fill="red" stroke="black"></rect>
+                   <text x="0" y="35" font-size="8">
+                      <tspan x="5.953125" dy="0em">INDIANA AVENUE</tspan>
+                   </text>
+                   <text x="0" y="92" font-size="10">
+                      <tspan x="11.203125" dy="0em">PRICE $220</tspan>
+                   </text>
+                   <rect y="97" width="78" height="3" stroke="black" class="owner-band" style="display: none;"></rect>
+                </g>
+                <g class="monopoly-square" transform="translate(490)" id="24">
+                   <rect fill="white" stroke="black" width="78" height="100"></rect>
+                   <rect width="78" height="20" fill="red" stroke="black"></rect>
+                   <text x="0" y="35" font-size="8">
+                      <tspan x="5.505207061767578" dy="0em">ILLINOIS AVENUE</tspan>
+                   </text>
+                   <text x="0" y="92" font-size="10">
+                      <tspan x="11.203125" dy="0em">PRICE $240</tspan>
+                   </text>
+                   <rect y="97" width="78" height="3" stroke="black" class="owner-band" style="display: none;"></rect>
+                </g>
+                <g class="monopoly-square" transform="translate(412)" id="25">
+                   <rect fill="white" stroke="black" width="78" height="100"></rect>
+                   <g transform="scale(0.2) translate(50, 140)">
+                      <path fill="#231f20" d=" M 53.25 32.29 C 67.32 32.29 81.38 31.88 95.44 31.75 C 98.36 36.41 01.25 41.09 104.10 45.79 C 97.92 65.46 91.66 85.11 85.40 104.76 C 112.26 104.74 139.12 104.76 165.98 104.75 C 175.59 105.16 185.21 105.00 194.83 104.95 C 195.30 103.72 195.11 102.66 194.25 101.75 C 187.88 94.04 182.81 84.83 181.69 74.75 C 180.70 67.33 182.07 59.50 186.08 53.11 C 189.44 47.44 195.60 43.66 202.07 42.77 C 223.29 42.73 244.52 42.76 265.75 42.76 C 265.64 47.26 265.90 51.75 266.04 56.24 C 257.26 68.06 247.71 79.67 242.29 93.52 C 235.94 107.42 233.68 123.53 237.79 138.39 C 240.30 147.47 246.53 154.83 252.74 161.66 C 252.75 164.02 252.75 166.38 252.75 168.75 C 246.50 168.77 240.23 168.57 234.01 169.33 C 232.38 169.35 233.30 171.20 233.99 171.84 C 239.63 179.37 240.63 189.78 237.53 198.54 C 235.22 205.20 230.08 210.74 223.75 213.79 C 215.17 218.40 204.32 217.83 195.89 213.18 C 189.05 209.12 184.00 202.15 182.25 194.40 C 180.57 185.77 182.48 176.39 188.13 169.54 C 167.12 169.93 146.10 169.61 125.09 169.83 C 129.60 174.39 133.32 180.03 134.26 186.49 C 136.20 197.28 131.00 208.94 121.54 214.54 C 114.51 218.47 105.82 219.38 98.17 216.78 C 89.87 213.94 82.88 206.96 80.88 198.31 C 78.11 188.23 81.30 176.85 89.28 170.01 C 85.83 169.99 82.37 170.00 78.92 169.99 C 73.14 185.67 68.43 201.72 62.95 217.51 C 47.59 217.43 32.23 217.63 16.87 217.40 C 29.42 201.68 42.34 186.26 54.82 170.50 C 52.06 169.59 48.72 170.83 46.43 168.70 C 35.32 160.78 29.45 146.29 32.14 132.88 C 32.29 126.89 35.46 121.66 38.43 116.66 C 41.50 112.73 45.25 109.37 48.91 106.00 C 53.89 106.00 58.88 106.00 63.86 105.99 C 57.22 85.55 50.82 65.02 44.16 44.58 C 47.19 40.49 50.17 36.35 53.25 32.29 Z"></path>
+                   </g>
+                   <text x="0" y="14" font-size="8">
+                      <tspan x="5.65625" dy="0em">B.&amp; O. RAILROAD</tspan>
+                   </text>
+                   <text x="0" y="92" font-size="10">
+                      <tspan x="11.203125" dy="0em">PRICE $200</tspan>
+                   </text>
+                   <rect y="97" width="78" height="3" stroke="black" class="owner-band" style="display: none;"></rect>
+                </g>
+                <g class="monopoly-square" transform="translate(334)" id="26">
+                   <rect fill="white" stroke="black" width="78" height="100"></rect>
+                   <rect width="78" height="20" fill="yellow" stroke="black"></rect>
+                   <text x="0" y="35" font-size="8">
+                      <tspan x="19.95833396911621" dy="0em">ATLANTIC</tspan>
+                      <tspan x="22.84375" dy="1.4em">AVENUE</tspan>
+                   </text>
+                   <text x="0" y="92" font-size="10">
+                      <tspan x="11.203125" dy="0em">PRICE $260</tspan>
+                   </text>
+                   <rect y="97" width="78" height="3" stroke="black" class="owner-band" style="display: none;"></rect>
+                </g>
+                <g class="monopoly-square" transform="translate(256)" id="27">
+                   <rect fill="white" stroke="black" width="78" height="100"></rect>
+                   <rect width="78" height="20" fill="yellow" stroke="black"></rect>
+                   <text x="0" y="35" font-size="8">
+                      <tspan x="19.44270896911621" dy="0em">VENTNOR</tspan>
+                      <tspan x="22.84375" dy="1.4em">AVENUE</tspan>
+                   </text>
+                   <text x="0" y="92" font-size="10">
+                      <tspan x="11.203125" dy="0em">PRICE $260</tspan>
+                   </text>
+                   <rect y="97" width="78" height="3" stroke="black" class="owner-band" style="display: none;"></rect>
+                </g>
+                <g class="monopoly-square" transform="translate(178)" id="28">
+                   <rect fill="white" stroke="black" width="78" height="100"></rect>
+                   <text x="0" y="14" font-size="8">
+                      <tspan x="8.776041030883789" dy="0em">WATER WORKS</tspan>
+                   </text>
+                   <text x="0" y="92" font-size="10">
+                      <tspan x="11.203125" dy="0em">PRICE $150</tspan>
+                   </text>
+                   <rect y="97" width="78" height="3" stroke="black" class="owner-band" style="display: none;"></rect>
+                </g>
+                <g class="monopoly-square" transform="translate(100)" id="29">
+                   <rect fill="white" stroke="black" width="78" height="100"></rect>
+                   <rect width="78" height="20" fill="yellow" stroke="black"></rect>
+                   <text x="0" y="35" font-size="8">
+                      <tspan x="23.515625" dy="0em">MARVIN</tspan>
+                      <tspan x="19.21875" dy="1.4em">GARDENS</tspan>
+                   </text>
+                   <text x="0" y="92" font-size="10">
+                      <tspan x="11.203125" dy="0em">PRICE $280</tspan>
+                   </text>
+                   <rect y="97" width="78" height="3" stroke="black" class="owner-band" style="display: none;"></rect>
+                </g>
+             </g>
+             <g class="monopoly-row" transform="translate(802, 902) rotate(270)">
+                <g class="monopoly-square" transform="translate(802)" id="30">
+                   <rect fill="white" stroke="black" width="100" height="100"></rect>
+                   <g transform="translate(-8, 100) rotate(-45)">
+                      <text x="0" y="0" font-size="12">
+                         <tspan x="45.20833206176758" dy="0em">GO TO JAIL</tspan>
+                      </text>
+                   </g>
+                </g>
+                <g class="monopoly-square" transform="translate(724)" id="31">
+                   <rect fill="white" stroke="black" width="78" height="100"></rect>
+                   <rect width="78" height="20" fill="green" stroke="black"></rect>
+                   <text x="0" y="35" font-size="8">
+                      <tspan x="6.473957061767578" dy="0em">PACIFIC AVENUE</tspan>
+                   </text>
+                   <text x="0" y="92" font-size="10">
+                      <tspan x="11.203125" dy="0em">PRICE $300</tspan>
+                   </text>
+                   <rect y="97" width="78" height="3" stroke="black" class="owner-band" style="display: none;"></rect>
+                </g>
+                <g class="monopoly-square" transform="translate(646)" id="32">
+                   <rect fill="white" stroke="black" width="78" height="100"></rect>
+                   <rect width="78" height="20" fill="green" stroke="black"></rect>
+                   <text x="0" y="35" font-size="8">
+                      <tspan x="24.848958015441895" dy="0em">NORTH</tspan>
+                      <tspan x="18.546875" dy="1.4em">CAROLINA</tspan>
+                      <tspan x="22.84375" dy="1.4em">AVENUE</tspan>
+                   </text>
+                   <text x="0" y="92" font-size="10">
+                      <tspan x="11.203125" dy="0em">PRICE $300</tspan>
+                   </text>
+                   <rect y="97" width="78" height="3" stroke="black" class="owner-band" style="display: none;"></rect>
+                </g>
+                <g class="monopoly-square" transform="translate(568)" id="33">
+                   <rect fill="white" stroke="black" width="78" height="100"></rect>
+                   <text x="0" y="14" font-size="8">
+                      <tspan x="14.333333969116211" dy="0em">COMMUNITY</tspan>
+                      <tspan x="25.442708015441895" dy="1.4em">CHEST</tspan>
+                   </text>
+                </g>
+                <g class="monopoly-square" transform="translate(490)" id="34">
+                   <rect fill="white" stroke="black" width="78" height="100"></rect>
+                   <rect width="78" height="20" fill="green" stroke="black"></rect>
+                   <text x="0" y="35" font-size="8">
+                      <tspan x="8.911458969116211" dy="0em">PENNSYLVANIA</tspan>
+                      <tspan x="22.84375" dy="1.4em">AVENUE</tspan>
+                   </text>
+                   <text x="0" y="92" font-size="10">
+                      <tspan x="11.203125" dy="0em">PRICE $320</tspan>
+                   </text>
+                   <rect y="97" width="78" height="3" stroke="black" class="owner-band" style="display: none;"></rect>
+                </g>
+                <g class="monopoly-square" transform="translate(412)" id="35">
+                   <rect fill="white" stroke="black" width="78" height="100"></rect>
+                   <g transform="scale(0.2) translate(50, 140)">
+                      <path fill="#231f20" d=" M 53.25 32.29 C 67.32 32.29 81.38 31.88 95.44 31.75 C 98.36 36.41 01.25 41.09 104.10 45.79 C 97.92 65.46 91.66 85.11 85.40 104.76 C 112.26 104.74 139.12 104.76 165.98 104.75 C 175.59 105.16 185.21 105.00 194.83 104.95 C 195.30 103.72 195.11 102.66 194.25 101.75 C 187.88 94.04 182.81 84.83 181.69 74.75 C 180.70 67.33 182.07 59.50 186.08 53.11 C 189.44 47.44 195.60 43.66 202.07 42.77 C 223.29 42.73 244.52 42.76 265.75 42.76 C 265.64 47.26 265.90 51.75 266.04 56.24 C 257.26 68.06 247.71 79.67 242.29 93.52 C 235.94 107.42 233.68 123.53 237.79 138.39 C 240.30 147.47 246.53 154.83 252.74 161.66 C 252.75 164.02 252.75 166.38 252.75 168.75 C 246.50 168.77 240.23 168.57 234.01 169.33 C 232.38 169.35 233.30 171.20 233.99 171.84 C 239.63 179.37 240.63 189.78 237.53 198.54 C 235.22 205.20 230.08 210.74 223.75 213.79 C 215.17 218.40 204.32 217.83 195.89 213.18 C 189.05 209.12 184.00 202.15 182.25 194.40 C 180.57 185.77 182.48 176.39 188.13 169.54 C 167.12 169.93 146.10 169.61 125.09 169.83 C 129.60 174.39 133.32 180.03 134.26 186.49 C 136.20 197.28 131.00 208.94 121.54 214.54 C 114.51 218.47 105.82 219.38 98.17 216.78 C 89.87 213.94 82.88 206.96 80.88 198.31 C 78.11 188.23 81.30 176.85 89.28 170.01 C 85.83 169.99 82.37 170.00 78.92 169.99 C 73.14 185.67 68.43 201.72 62.95 217.51 C 47.59 217.43 32.23 217.63 16.87 217.40 C 29.42 201.68 42.34 186.26 54.82 170.50 C 52.06 169.59 48.72 170.83 46.43 168.70 C 35.32 160.78 29.45 146.29 32.14 132.88 C 32.29 126.89 35.46 121.66 38.43 116.66 C 41.50 112.73 45.25 109.37 48.91 106.00 C 53.89 106.00 58.88 106.00 63.86 105.99 C 57.22 85.55 50.82 65.02 44.16 44.58 C 47.19 40.49 50.17 36.35 53.25 32.29 Z"></path>
+                   </g>
+                   <text x="0" y="14" font-size="8">
+                      <tspan x="15.140625" dy="0em">SHORT LINE</tspan>
+                   </text>
+                   <text x="0" y="92" font-size="10">
+                      <tspan x="11.203125" dy="0em">PRICE $200</tspan>
+                   </text>
+                   <rect y="97" width="78" height="3" stroke="black" class="owner-band" style="display: none;"></rect>
+                </g>
+                <g class="monopoly-square" transform="translate(334)" id="36">
+                   <rect fill="white" stroke="black" width="78" height="100"></rect>
+                   <text x="0" y="14" font-size="8">
+                      <tspan x="22.109375" dy="0em">CHANCE</tspan>
+                   </text>
+                </g>
+                <g class="monopoly-square" transform="translate(256)" id="37">
+                   <rect fill="white" stroke="black" width="78" height="100"></rect>
+                   <rect width="78" height="20" fill="blue" stroke="black"></rect>
+                   <text x="0" y="35" font-size="8">
+                      <tspan x="14.171875" dy="0em">PARK PLACE</tspan>
+                   </text>
+                   <text x="0" y="92" font-size="10">
+                      <tspan x="11.203125" dy="0em">PRICE $350</tspan>
+                   </text>
+                   <rect y="97" width="78" height="3" stroke="black" class="owner-band" style="display: none;"></rect>
+                </g>
+                <g class="monopoly-square" transform="translate(178)" id="38">
+                   <rect fill="white" stroke="black" width="78" height="100"></rect>
+                   <text x="0" y="14" font-size="8">
+                      <tspan x="14.395833969116211" dy="0em">LUXURY TAX</tspan>
+                   </text>
+                   <text x="0" y="92" font-size="10">
+                      <tspan x="20.09375" dy="0em">PAY $75</tspan>
+                   </text>
+                </g>
+                <g class="monopoly-square" transform="translate(100)" id="39">
+                   <rect fill="white" stroke="black" width="78" height="100"></rect>
+                   <rect width="78" height="20" fill="blue" stroke="black"></rect>
+                   <text x="0" y="35" font-size="8">
+                      <tspan x="13.583333969116211" dy="0em">BOARDWALK</tspan>
+                   </text>
+                   <text x="0" y="92" font-size="10">
+                      <tspan x="11.203125" dy="0em">PRICE $400</tspan>
+                   </text>
+                   <rect y="97" width="78" height="3" stroke="black" class="owner-band" style="display: none;"></rect>
+                </g>
+             </g>
+          </svg>
+          <div class="monopoly-players">
+             <div class="player-panel" id="player0">
+                <svg width="12" height="12" class="player-panel-token">
+                   <circle cx="6" cy="6" r="6" fill="red"></circle>
+                </svg>
+                <span class="player-name">Player 1</span><span class="player-money" id="1500" style="color: rgb(0, 0, 0);">$1500</span>
+                <div class="player-properties"></div>
+             </div>
+             <div class="player-panel" id="player1">
+                <svg width="12" height="12" class="player-panel-token">
+                   
+                </svg>
+                <span class="player-name">Player 2</span><span class="player-money" id="1440" style="color: rgb(0, 0, 0);">$1440</span>
+                <div class="player-properties">
+                   <div class="player-property" id="bt" style="background-color: midnightblue;">Baltic Avenue</div>
+                </div>
+             </div>
+             <div class="player-panel" id="player2">
+                <svg width="12" height="12" class="player-panel-token">
+                   
+                </svg>
+                <span class="player-name">Player 3</span><span class="player-money" id="1300" style="color: rgb(0, 0, 0);">$1300</span>
+                <div class="player-properties">
+                   <div class="player-property" id="rr-reading" style="background-color: black;">Reading Railroad</div>
+                </div>
+             </div>
+          </div>
+       </div>
+    </div>
+    
+    
+ 
+
+
+    
+    
+    
+
+{% endblock %}
+
+{% block script %}
+<script src="{% static 'games/monopoly.js' %}"></script>
+    
+{% endblock %}
